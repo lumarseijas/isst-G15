@@ -36,18 +36,15 @@ const FormularioReserva = () => {
         required
       />
 
-       {/* Mostrar el campo de teléfono solo si el usuario es administrador */}
-       {isAdmin && (
-        <>
-          <label>Teléfono (opcional):</label>
-          <input
-            type="text"
-            name="telefono"
-            value={formData.telefono}
-            onChange={handleChange}
-          />
-        </>
-      )}
+    {/* Mostrar el campo de teléfono solo si el usuario es administrador */}
+    {/*isAdmin && */}
+       <label>Teléfono:</label>
+       <input
+         type="text"
+         name="telefono"
+         value={formData.telefono}
+         onChange={handleChange}
+       />       
 
       <label>Servicio:</label>
       <select
