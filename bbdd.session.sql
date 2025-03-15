@@ -5,7 +5,7 @@ USE reserva_belleza;
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
     telefono VARCHAR(20), -- Solo para clientes online
     tipo ENUM('administrador', 'cliente_online') NOT NULL
     );
@@ -30,7 +30,7 @@ CREATE TABLE reservas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cliente_online INT, -- Si es cliente online, referenciado a usuarios
     cliente_presencial VARCHAR(255), -- Si es cliente presencial, se guarda un nombre manualmente
-    num_tlfno VARCHAR(20), -- Para clientes presenciales
+    num_tlfno VARCHAR(20), -- Para clientes presenciales (podria quitarse pero no molesta)
     trabajador_id INT NOT NULL, -- Referencia a la tabla trabajadores
     servicio_id INT NOT NULL, -- Referencia a la tabla servicios
     fecha_y_hora DATETIME NOT NULL,
@@ -41,5 +41,3 @@ CREATE TABLE reservas (
     -- lo tendremos que poner en el backend 
 );
 
-
-COMMIT;
