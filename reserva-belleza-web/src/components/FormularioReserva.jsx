@@ -10,11 +10,13 @@ const FormularioReserva = () => {
   });
 
   const [reservas, setReservas] = useState([]);
+  const [fechaMinima, setFechaMinima] = useState('');
 
-  // Cargar reservas previas del localStorage
+  // Obtener la fecha actual en formato YYYY-MM-DD
   useEffect(() => {
-    const reservasGuardadas = JSON.parse(localStorage.getItem('reservas')) || [];
-    setReservas(reservasGuardadas);
+    const hoy = new Date();
+    const formatoFecha = hoy.toISOString().split('T')[0]; // Convierte a YYYY-MM-DD
+    setFechaMinima(formatoFecha);
   }, []);
 
   // Manejar cambios en los inputs
@@ -58,10 +60,10 @@ const FormularioReserva = () => {
         </select>
 
         <label>Fecha *</label>
-        <input type="date" name="fecha" value={datos.fecha} onChange={handleChange} required />
+        <input type="date" name="fecha" value={datos.fecha} onChange={handleChange} required min={fechaMinima} />
 
         <label>Hora *</label>
-        <input type="time" name="hora" value={datos.hora} onChange={handleChange} required />
+        <input type="time" name="hora" value={datos.hora} onChange={handleChange} required min="09:00" max="21:00" />
 
         <button type="submit">Reservar</button>
       </form>
