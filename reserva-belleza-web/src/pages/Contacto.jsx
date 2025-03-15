@@ -2,7 +2,7 @@ const Contacto = () => {
     return (
       <div>
         <h2>Contacto</h2>
-        <p>¿Tienes dudas? Escríbenos y te ayudaremos.</p>
+        <p>poner num tlfno, direccion...</p>
       </div>
     );
   };
