@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-const Navbar = () => {
+const Encabezado = () => {
   return (
     <nav>
       <h1>Reserva Belleza</h1>
@@ -15,4 +15,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default Encabezado;

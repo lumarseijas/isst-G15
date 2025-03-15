@@ -1,4 +1,4 @@
-const Footer = () => {
+const PiePagina = () => {
     return (
       <footer>
         <p>© 2025 Reserva Belleza. G15. </p>
@@ -6,5 +6,5 @@ const Footer = () => {
     );
   };
   
-  export default Footer;
+  export default PiePagina;
   
