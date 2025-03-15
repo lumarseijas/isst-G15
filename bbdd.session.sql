@@ -6,7 +6,7 @@ CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    telefono VARCHAR(20), -- Solo aplicable para clientes online
+    telefono VARCHAR(20), -- Solo para clientes online
     tipo ENUM('administrador', 'cliente_online') NOT NULL
 );
 
@@ -22,7 +22,7 @@ CREATE TABLE servicios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre_servicio VARCHAR(255) UNIQUE NOT NULL,
     duracion INT NOT NULL, -- En minutos
-    precio DECIMAL(10,2) NOT NULL
+    precio DECIMAL(10,2) NOT NULL -- En euros
 );
 
 -- Tabla de Reservas
@@ -43,5 +43,4 @@ CREATE TABLE reservas (
     )
 );
 
-
-
+COMMIT;
