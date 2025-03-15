@@ -54,9 +54,12 @@ const FormularioReserva = () => {
         <label>Servicio a Contratar *</label>
         <select name="servicio" value={datos.servicio} onChange={handleChange} required>
           <option value="">Selecciona un servicio</option>
-          <option value="Corte de Cabello">Corte de Cabello</option>
+          <option value="Corte de Pelo">Corte de pelo</option>
           <option value="Manicura">Manicura</option>
-          <option value="Masaje">Masaje</option>
+          <option value="Tinte de Pelo">Tinte de Pelo</option>
+          <option value="Depilación Cera">Depilación Cera</option>
+          <option value="Peinado">Peinado</option>
+          <option value="Maquillaje">Maquillaje</option>
         </select>
 
         <label>Fecha *</label>

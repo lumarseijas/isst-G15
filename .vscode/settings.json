@@ -9,8 +9,8 @@
             "server": "localhost",
             "port": 3306,
             "driver": "MySQL",
-            "database": "reserva_belleza",
             "name": "bbdd",
+            "database": "reserva_belleza",
             "username": "root"
         }
     ]
