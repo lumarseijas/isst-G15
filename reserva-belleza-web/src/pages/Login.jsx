@@ -22,12 +22,12 @@ const Login = () => {
       const result = await response.json();
 
       if (response.ok) {
-        localStorage.setItem('usuario', JSON.stringify(result.usuario)); // Guardar usuario en sesión
-        localStorage.setItem('token', result.token); // Guardar token
-        alert("Inicio de sesión exitoso");
-        navigate('/reservas'); // Redirige a la página de reservas
+        // Guardar los datos del usuario en localStorage
+        localStorage.setItem('usuario', JSON.stringify(result.usuario));
+        alert("Inicio de sesión exitoso ✅");
+        navigate('/'); // Redirige al usuario a la página principal
       } else {
-        alert(result.error); // Muestra mensaje de error
+        alert(result.error);
       }
     } catch (error) {
       console.error("Error en el inicio de sesión:", error);
@@ -46,11 +46,11 @@ const Login = () => {
         <input type="password" name="password" value={datos.password} onChange={handleChange} required />
 
         <button type="submit">Ingresar</button>
-        {/* Línea de registro */}
-      <p className="registro-link">
-        ¿No estás registrado? Regístrate <span onClick={() => navigate('/registro')}>aquí</span>
-      </p>
       </form>
+
+      <p className="registro-link">
+        ¿No estás registrado? <span onClick={() => navigate('/registro')}>Regístrate aquí</span>
+      </p>
     </div>
   );
 };

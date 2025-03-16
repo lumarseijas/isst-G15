@@ -10,8 +10,7 @@ const avataresDisponibles = [
 
 const Perfil = () => {
   const navigate = useNavigate();
-  const usuario = JSON.parse(localStorage.getItem('usuario'));
-
+  const usuarioGuardado = JSON.parse(localStorage.getItem('usuario'));
   const [datos, setDatos] = useState({
     nombre: '',
     email: '',
@@ -19,32 +18,41 @@ const Perfil = () => {
     avatar: ''
   });
 
-  // Cargar los datos del usuario desde la base de datos al cargar la página
+  // Cargar los datos del usuario
   useEffect(() => {
-    if (!usuario) {
-      navigate('/auth'); 
+    if (!usuarioGuardado) {
+      navigate('/auth');
       return;
     }
 
-    fetch(`http://localhost:5000/api/usuarios/${usuario.id}`)
+    fetch(`http://localhost:5000/api/usuarios/${usuarioGuardado.id}`)
       .then(response => response.json())
       .then(data => setDatos(data))
       .catch(error => console.error("Error al cargar los datos del usuario:", error));
-  }, [usuario, navigate]);
+  }, [usuarioGuardado, navigate]);
 
   const handleChange = (e) => {
-    setDatos({ ...datos, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setDatos((prevDatos) => ({
+      ...prevDatos,
+      [name]: value
+    }));
   };
+  
 
   const handleAvatarChange = (avatar) => {
-    setDatos({ ...datos, avatar });
+    setDatos((prevDatos) => ({
+      ...prevDatos,
+      avatar: avatar // Actualiza solo el avatar
+    }));
+    console.log("Avatar seleccionado:", avatar); // Depuración
   };
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await fetch(`http://localhost:5000/api/usuarios/${usuario.id}`, {
+      const response = await fetch(`http://localhost:5000/api/usuarios/${usuarioGuardado.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(datos),
@@ -54,7 +62,7 @@ const Perfil = () => {
 
       if (response.ok) {
         alert("Perfil actualizado correctamente");
-        localStorage.setItem('usuario', JSON.stringify(datos)); // Actualizar localStorage con los nuevos datos
+        localStorage.setItem('usuario', JSON.stringify(datos)); // Guardar el nuevo avatar
         navigate('/');
       } else {
         alert(result.error);
@@ -70,13 +78,13 @@ const Perfil = () => {
       <h2>Editar Perfil</h2>
       <form onSubmit={handleSubmit} className="formulario">
         <label>Nombre</label>
-        <input type="text" name="nombre" value={datos.nombre} onChange={handleChange} required />
+        <input type="text" name="nombre" defaultValue={datos.nombre} onChange={handleChange} required />
 
         <label>Email</label>
         <input type="email" name="email" value={datos.email} onChange={handleChange} required disabled />
 
         <label>Teléfono</label>
-        <input type="tel" name="telefono" value={datos.telefono} onChange={handleChange} />
+        <input type="tel" name="telefono" defaultValue={datos.telefono} onChange={handleChange} />
 
         <label>Selecciona tu avatar</label>
         <div className="avatar-selection">
@@ -85,7 +93,7 @@ const Perfil = () => {
               key={index}
               src={avatar}
               alt={`Avatar ${index + 1}`}
-              className={`avatar-option ${datos.avatar === avatar ? "selected" : ""}`}
+              className={`avatar-option ${datos.avatar === avatar ? "selected" : ""}`} //aqui error
               onClick={() => handleAvatarChange(avatar)}
             />
           ))}
