@@ -203,3 +203,88 @@ button:hover {
   border-radius: 5px;
   font-size: 16px;
 }
+
+/* ==== ESTILOS PARA LA PÁGINA DE INICIO ==== */
+.home-container {
+  text-align: center;
+}
+
+/* ==== HERO (SECCIÓN PRINCIPAL) ==== */
+.hero {
+  position: relative;
+  width: 100%;
+  height: 100vh; /* O ajusta según el tamaño deseado */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #5a2e7d; /* Morado oscuro */
+}
+
+/* IMAGEN DE FONDO CON TRANSPARENCIA */
+.hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('/src/assets/imagenpelu.jpg') center/cover no-repeat;
+  opacity: 0.6; /* Ajusta el nivel de transparencia aquí */
+  z-index: -1; /* Mantiene la imagen de fondo detrás del texto */
+}
+
+/* CONTENEDOR DEL TEXTO PARA QUE NO SE VEA TRANSPARENTE */
+.hero-content {
+  position: relative;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0); /* Sin fondo */
+  padding: 20px;
+  border-radius: 10px;
+}
+
+/* TEXTO PRINCIPAL */
+.hero h1 {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #4a2275; /* Morado oscuro */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* TEXTO SECUNDARIO */
+.hero p {
+  font-size: 1.4rem;
+  max-width: 600px;
+  margin: 10px auto;
+  color: #4a2275; /* Morado oscuro */
+  font-weight: 500;
+}
+
+/* BOTÓN */
+.btn-primary {
+  background-color: #b48ec6;
+  color: white;
+  padding: 12px 20px;
+  text-decoration: none;
+  border-radius: 5px;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.btn-primary:hover {
+  background-color: #8e58b6;
+}
+
+/* ==== SECCIÓN SOBRE NOSOTROS ==== */
+.about-section {
+  padding: 50px 20px;
+  background-color: #f5e9ff;
+}
+
+.about-section p {
+  font-size: 1.3rem;
+  max-width: 600px;
+  margin: auto;
+  color: #444;
+}
