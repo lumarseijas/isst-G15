@@ -36,16 +36,16 @@ const Registro = () => {
   };
 
   return (
-    <div className="registro-container">
+    <div className="form-container">
       <h2>Registro de Usuario</h2>
-      <form onSubmit={handleSubmit} className="registro-form">
+      <form onSubmit={handleSubmit} className="formulario">
         <label>Nombre</label>
         <input type="text" name="nombre" value={datos.nombre} onChange={handleChange} required />
 
         <label>Email</label>
         <input type="email" name="email" value={datos.email} onChange={handleChange} required />
 
-        <label>Teléfono (opcional)</label>
+        <label>Teléfono</label>
         <input type="tel" name="telefono" value={datos.telefono} onChange={handleChange} />
 
         <label>Contraseña</label>

@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const FormularioReserva = ({ esAdmin }) => {  // esAdmin determina si se muestra el campo teléfono
+const FormularioReserva = () => {
   const [datos, setDatos] = useState({
     nombre_cliente: '',
-    num_tlfno: '',
     servicio_id: '',
     fecha: '',
     hora: ''
   });
 
-  const [servicios, setServicios] = useState([]); // Lista de servicios desde la base de datos
+  const [servicios, setServicios] = useState([]);
+  const navigate = useNavigate();
 
-  // Obtener los servicios desde la API del backend
   useEffect(() => {
     fetch('http://localhost:5000/api/servicios')
       .then(response => response.json())
@@ -19,40 +19,28 @@ const FormularioReserva = ({ esAdmin }) => {  // esAdmin determina si se muestra
       .catch(error => console.error("Error al obtener los servicios:", error));
   }, []);
 
-  // Función para manejar cambios en los inputs
   const handleChange = (e) => {
     setDatos({ ...datos, [e.target.name]: e.target.value });
   };
 
-  // Función para validar la fecha
-  const getFechaMinima = () => {
-    const hoy = new Date();
-    hoy.setDate(hoy.getDate() + 1); // Solo permite días posteriores al actual
-    return hoy.toISOString().split('T')[0];
-  };
-
-  // Función para verificar que la fecha no sea sábado ni domingo
-  const esDiaLaboral = (fecha) => {
-    const diaSemana = new Date(fecha).getDay();
-    return diaSemana !== 6 && diaSemana !== 0; // 6 = Sábado, 0 = Domingo
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+
+    if (!usuario) {
+      alert("Debes iniciar sesión o registrarte para reservar un servicio.");
+      navigate('/auth'); // Redirige a la página de autenticación en lugar de login
+      return;
+    }
 
     if (!datos.nombre_cliente || !datos.servicio_id || !datos.fecha || !datos.hora) {
       alert("Por favor, complete todos los campos obligatorios.");
       return;
     }
 
-    if (!esDiaLaboral(datos.fecha)) {
-      alert("No se pueden hacer reservas los sábados ni domingos.");
-      return;
-    }
-
     const reservaData = {
       nombre_cliente: datos.nombre_cliente,
-      num_tlfno: esAdmin ? datos.num_tlfno : null, // Solo envía el teléfono si es admin
       servicio_id: datos.servicio_id,
       fecha_y_hora: `${datos.fecha} ${datos.hora}`
     };
@@ -79,14 +67,6 @@ const FormularioReserva = ({ esAdmin }) => {  // esAdmin determina si se muestra
         <label>Nombre del Cliente *</label>
         <input type="text" name="nombre_cliente" value={datos.nombre_cliente} onChange={handleChange} required />
 
-        {/* Solo mostrar el campo teléfono si el usuario es admin */}
-        {esAdmin && (
-          <>
-            <label>Teléfono (opcional)</label>
-            <input type="tel" name="num_tlfno" value={datos.num_tlfno} onChange={handleChange} />
-          </>
-        )}
-
         <label>Servicio *</label>
         <select name="servicio_id" value={datos.servicio_id} onChange={handleChange} required>
           <option value="">Selecciona un servicio</option>
@@ -98,7 +78,7 @@ const FormularioReserva = ({ esAdmin }) => {  // esAdmin determina si se muestra
         </select>
 
         <label>Fecha *</label>
-        <input type="date" name="fecha" value={datos.fecha} onChange={handleChange} required min={getFechaMinima()} />
+        <input type="date" name="fecha" value={datos.fecha} onChange={handleChange} required />
 
         <label>Hora *</label>
         <input type="time" name="hora" value={datos.hora} onChange={handleChange} required min="09:00" max="21:00" />

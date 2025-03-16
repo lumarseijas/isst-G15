@@ -108,22 +108,23 @@ footer {
 .auth-button:hover {
   background-color: var(--color-hover);
 }
-
 /* ==== FORMULARIOS (LOGIN & REGISTRO) ==== */
 .form-container {
-  max-width: 350px;
+  max-width: 500px; /* Aumentamos el ancho */
+  width: 100%;
   margin: auto;
-  padding: 20px;
+  padding: 30px;
   background: white;
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(169, 108, 207, 0.3);
+  box-shadow: 0 0 15px rgba(169, 108, 207, 0.3);
   text-align: center;
 }
 
+/* Organizar los campos en columna con más espacio */
 .formulario {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 20px; /* Aumenta la separación entre campos */
 }
 
 label {
@@ -133,17 +134,19 @@ label {
 }
 
 input {
-  padding: 10px;
+  padding: 12px;
   border: 1px solid var(--color-secundario);
   border-radius: 5px;
   width: 100%;
+  font-size: 16px;
 }
 
+/* Botón más grande y estilizado */
 button {
-  padding: 10px;
+  padding: 12px;
   background-color: var(--color-botones);
   color: white;
-  font-size: 16px;
+  font-size: 18px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -152,6 +155,7 @@ button {
 button:hover {
   background-color: var(--color-hover);
 }
+
 
 /* ==== PÁGINA DE AUTENTICACIÓN ==== */
 .auth-container {

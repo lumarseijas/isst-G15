@@ -2,6 +2,7 @@ import express from 'express';
 import mysql from 'mysql2';
 import cors from 'cors';
 
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -46,22 +47,40 @@ app.get('/api/servicios', (req, res) => {
     });
   });
 
-
 // Ruta para registrar una reserva
 app.post('/api/reservas', (req, res) => {
-    const { cliente_online, cliente_presencial, num_tlfno, trabajador_id, servicio_id, fecha_y_hora } = req.body;
+    const { nombre_cliente, num_tlfno, servicio_id, fecha_y_hora } = req.body;
   
     const sql = `
-      INSERT INTO reservas (cliente_online, cliente_presencial, num_tlfno, trabajador_id, servicio_id, fecha_y_hora)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO reservas (cliente_presencial, num_tlfno, servicio_id, fecha_y_hora)
+      VALUES (?, ?, ?, ?)
     `;
   
-    db.query(sql, [cliente_online || null, cliente_presencial || null, num_tlfno || null, trabajador_id, servicio_id, fecha_y_hora], (err, result) => {
+    db.query(sql, [nombre_cliente, num_tlfno || null, servicio_id, fecha_y_hora], (err, result) => {
       if (err) {
         console.error("❌ Error al registrar la reserva:", err);
         res.status(500).json({ error: "Error al registrar la reserva" });
       } else {
         res.json({ mensaje: "Reserva guardada correctamente" });
+      }
+    });
+  });
+
+
+// Ruta para registrar usuarios
+app.post('/api/registro', async (req, res) => {
+    const { nombre, email, telefono, password } = req.body;
+  
+    // Encriptar la contraseña antes de guardarla
+    const hashedPassword = await bcrypt.hash(password, 10);
+  
+    const sql = 'INSERT INTO usuarios (nombre, email, telefono, password) VALUES (?, ?, ?, ?)';
+    db.query(sql, [nombre, email, telefono, hashedPassword], (err, result) => {
+      if (err) {
+        console.error("❌ Error al registrar usuario:", err);
+        res.status(500).json({ error: "Error al registrar usuario" });
+      } else {
+        res.json({ mensaje: "Usuario registrado correctamente" });
       }
     });
   });

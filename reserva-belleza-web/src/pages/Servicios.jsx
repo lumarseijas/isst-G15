@@ -18,7 +18,7 @@ const Servicios = () => {
         {servicios.length > 0 ? (
           servicios.map((servicio) => (
             <li key={servicio.id} className="servicio-item">
-              <strong>{servicio.nombre_servicio}</strong> - {servicio.duracion} min - ${servicio.precio}
+              <strong>{servicio.nombre_servicio}</strong> - {servicio.duracion} min - {servicio.precio}€
             </li>
           ))
         ) : (
