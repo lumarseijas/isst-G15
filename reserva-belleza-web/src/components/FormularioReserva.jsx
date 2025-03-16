@@ -1,19 +1,17 @@
 import { useState, useEffect } from 'react';
 
-const FormularioReserva = () => {
+const FormularioReserva = ({ esAdmin }) => {  // esAdmin determina si se muestra el campo teléfono
   const [datos, setDatos] = useState({
-    tipo_cliente: 'online',
-    cliente_online: '',
-    cliente_presencial: '',
+    nombre_cliente: '',
     num_tlfno: '',
-    trabajador_id: '',
     servicio_id: '',
-    fecha_y_hora: ''
+    fecha: '',
+    hora: ''
   });
 
-  const [servicios, setServicios] = useState([]); // Estado para almacenar los servicios
+  const [servicios, setServicios] = useState([]); // Lista de servicios desde la base de datos
 
-  // Obtener la lista de servicios desde el backend
+  // Obtener los servicios desde la API del backend
   useEffect(() => {
     fetch('http://localhost:5000/api/servicios')
       .then(response => response.json())
@@ -21,25 +19,42 @@ const FormularioReserva = () => {
       .catch(error => console.error("Error al obtener los servicios:", error));
   }, []);
 
+  // Función para manejar cambios en los inputs
   const handleChange = (e) => {
     setDatos({ ...datos, [e.target.name]: e.target.value });
+  };
+
+  // Función para validar la fecha
+  const getFechaMinima = () => {
+    const hoy = new Date();
+    hoy.setDate(hoy.getDate() + 1); // Solo permite días posteriores al actual
+    return hoy.toISOString().split('T')[0];
+  };
+
+  // Función para verificar que la fecha no sea sábado ni domingo
+  const esDiaLaboral = (fecha) => {
+    const diaSemana = new Date(fecha).getDay();
+    return diaSemana !== 6 && diaSemana !== 0; // 6 = Sábado, 0 = Domingo
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!datos.servicio_id || !datos.trabajador_id || !datos.fecha_y_hora) {
+    if (!datos.nombre_cliente || !datos.servicio_id || !datos.fecha || !datos.hora) {
       alert("Por favor, complete todos los campos obligatorios.");
       return;
     }
 
+    if (!esDiaLaboral(datos.fecha)) {
+      alert("No se pueden hacer reservas los sábados ni domingos.");
+      return;
+    }
+
     const reservaData = {
-      cliente_online: datos.tipo_cliente === 'online' ? datos.cliente_online : null,
-      cliente_presencial: datos.tipo_cliente === 'presencial' ? datos.cliente_presencial : null,
-      num_tlfno: datos.tipo_cliente === 'presencial' ? datos.num_tlfno : null,
-      trabajador_id: datos.trabajador_id,
+      nombre_cliente: datos.nombre_cliente,
+      num_tlfno: esAdmin ? datos.num_tlfno : null, // Solo envía el teléfono si es admin
       servicio_id: datos.servicio_id,
-      fecha_y_hora: datos.fecha_y_hora
+      fecha_y_hora: `${datos.fecha} ${datos.hora}`
     };
 
     try {
@@ -61,33 +76,18 @@ const FormularioReserva = () => {
     <div className="form-container">
       <h2>Reserva tu cita</h2>
       <form onSubmit={handleSubmit} className="formulario">
-        <label>Tipo de Cliente</label>
-        <select name="tipo_cliente" value={datos.tipo_cliente} onChange={handleChange}>
-          <option value="online">Cliente Online</option>
-          <option value="presencial">Cliente Presencial</option>
-        </select>
+        <label>Nombre del Cliente *</label>
+        <input type="text" name="nombre_cliente" value={datos.nombre_cliente} onChange={handleChange} required />
 
-        {datos.tipo_cliente === "online" && (
+        {/* Solo mostrar el campo teléfono si el usuario es admin */}
+        {esAdmin && (
           <>
-            <label>ID Cliente</label>
-            <input type="text" name="cliente_online" value={datos.cliente_online} onChange={handleChange} required />
-          </>
-        )}
-
-        {datos.tipo_cliente === "presencial" && (
-          <>
-            <label>Nombre Cliente Presencial</label>
-            <input type="text" name="cliente_presencial" value={datos.cliente_presencial} onChange={handleChange} required />
-
-            <label>Teléfono</label>
+            <label>Teléfono (opcional)</label>
             <input type="tel" name="num_tlfno" value={datos.num_tlfno} onChange={handleChange} />
           </>
         )}
 
-        <label>Trabajador</label>
-        <input type="text" name="trabajador_id" value={datos.trabajador_id} onChange={handleChange} required />
-
-        <label>Servicio</label>
+        <label>Servicio *</label>
         <select name="servicio_id" value={datos.servicio_id} onChange={handleChange} required>
           <option value="">Selecciona un servicio</option>
           {servicios.map(servicio => (
@@ -97,8 +97,11 @@ const FormularioReserva = () => {
           ))}
         </select>
 
-        <label>Fecha y Hora</label>
-        <input type="datetime-local" name="fecha_y_hora" value={datos.fecha_y_hora} onChange={handleChange} required />
+        <label>Fecha *</label>
+        <input type="date" name="fecha" value={datos.fecha} onChange={handleChange} required min={getFechaMinima()} />
+
+        <label>Hora *</label>
+        <input type="time" name="hora" value={datos.hora} onChange={handleChange} required min="09:00" max="21:00" />
 
         <button type="submit">Reservar</button>
       </form>
