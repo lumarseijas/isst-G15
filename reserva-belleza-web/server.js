@@ -132,7 +132,7 @@ app.post('/api/login', (req, res) => {
   });
   
   app.get('/api/trabajadores', (req, res) => {
-    const sql = 'SELECT id, nombre FROM trabajadores';
+    const sql = 'SELECT id, nombre, telefono FROM trabajadores';
     db.query(sql, (err, result) => {
       if (err) {
         console.error('Error al obtener trabajadores:', err);
