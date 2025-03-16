@@ -22,12 +22,11 @@ const Login = () => {
       const result = await response.json();
 
       if (response.ok) {
-        localStorage.setItem('usuario', JSON.stringify(result.usuario)); // Guardar usuario en sesión
-        localStorage.setItem('token', result.token); // Guardar token
-        alert("Inicio de sesión exitoso");
+        localStorage.setItem('usuario', JSON.stringify(result.usuario));
+        alert("Inicio de sesión correcto");
         navigate('/reservas'); // Redirige a la página de reservas
       } else {
-        alert(result.error); // Muestra mensaje de error
+        alert(result.error);
       }
     } catch (error) {
       console.error("Error en el inicio de sesión:", error);
@@ -47,6 +46,11 @@ const Login = () => {
 
         <button type="submit">Ingresar</button>
       </form>
+
+      {/* Línea de registro */}
+      <p className="registro-link">
+        ¿No estás registrado? Regístrate <span onClick={() => navigate('/registro')}>aquí</span>
+      </p>
     </div>
   );
 };

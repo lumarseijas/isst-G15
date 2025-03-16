@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const avataresDisponibles = [
-    "/img/avatar1.png",
-    "/img/avatar2.png",
-    "/img/avatar3.png",
-    "/img/avatar4.png"
-  ];
+  "/img/avatar1.png",
+  "/img/avatar2.png",
+  "/img/avatar3.png",
+  "/img/avatar4.png"
+];
 
 const Registro = () => {
   const navigate = useNavigate();
@@ -89,6 +89,11 @@ const Registro = () => {
 
         <button type="submit">Registrar</button>
       </form>
+
+      {/* Línea de inicio de sesión */}
+      <p className="registro-link">
+        ¿Ya tienes cuenta? Inicia sesión <span onClick={() => navigate('/login')}>aquí</span>
+      </p>
     </div>
   );
 };

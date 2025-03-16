@@ -260,6 +260,22 @@ button:hover {
   background-color: var(--color-hover);
 }
 
+.registro-link {
+  margin-top: 15px;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.registro-link span {
+  color: #b48ec6;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.registro-link span:hover {
+  text-decoration: underline;
+}
+
 
 /* ==== PÁGINA DE AUTENTICACIÓN ==== */
 .auth-container {
