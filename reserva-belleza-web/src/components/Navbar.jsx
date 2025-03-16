@@ -4,7 +4,7 @@ import { useState } from 'react';
 const Navbar = () => {
   const navigate = useNavigate();
   const [usuario, setUsuario] = useState(JSON.parse(localStorage.getItem('usuario')));
-
+  const [mostrarPerfil, setMostrarPerfil] = useState(false);
   const handleLogout = () => {
     localStorage.removeItem('usuario');
     setUsuario(null);
