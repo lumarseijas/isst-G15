@@ -10,8 +10,13 @@ import Footer from "./components/Footer";
 import AuthMenu from "./pages/AuthMenu";
 import Login from './pages/Login';
 import Registro from './pages/Registro';
+import Perfil from './pages/Perfil';
+import { useEffect } from 'react';
 
 function App() {
+  useEffect(() => {
+    localStorage.removeItem('usuario'); // Elimina cualquier usuario almacenado
+  }, []);
   return (
     <>
       <Navbar />
@@ -23,7 +28,9 @@ function App() {
         <Route path="/admin" element={<Admin />} />
         <Route path="/login" element={<Login />} />
         <Route path="/registro" element={<Registro />} />
+        <Route path="/perfil" element={<Perfil />} />
         <Route path="/auth" element={<AuthMenu />} />
+
       </Routes>
       <Footer />
     </>

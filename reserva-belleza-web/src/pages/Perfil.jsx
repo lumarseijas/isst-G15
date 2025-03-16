@@ -1,23 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const avataresDisponibles = [
-    "/img/avatar1.png",
-    "/img/avatar2.png",
-    "/img/avatar3.png",
-    "/img/avatar4.png"
-  ];
+  "/img/avatar1.png",
+  "/img/avatar2.png",
+  "/img/avatar3.png",
+  "/img/avatar4.png"
+];
 
-const Registro = () => {
+const Perfil = () => {
   const navigate = useNavigate();
-  
+  const usuario = JSON.parse(localStorage.getItem('usuario'));
+
   const [datos, setDatos] = useState({
     nombre: '',
     email: '',
     telefono: '',
-    password: '',
-    avatar: avataresDisponibles[0] // Avatar por defecto
+    avatar: ''
   });
+
+  // Cargar los datos del usuario desde la base de datos al cargar la página
+  useEffect(() => {
+    if (!usuario) {
+      navigate('/auth'); 
+      return;
+    }
+
+    fetch(`http://localhost:5000/api/usuarios/${usuario.id}`)
+      .then(response => response.json())
+      .then(data => setDatos(data))
+      .catch(error => console.error("Error al cargar los datos del usuario:", error));
+  }, [usuario, navigate]);
 
   const handleChange = (e) => {
     setDatos({ ...datos, [e.target.name]: e.target.value });
@@ -30,47 +43,40 @@ const Registro = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!datos.nombre || !datos.email || !datos.password) {
-      alert("Por favor, complete todos los campos obligatorios.");
-      return;
-    }
-
     try {
-      const response = await fetch('http://localhost:5000/api/registro', {
-        method: 'POST',
+      const response = await fetch(`http://localhost:5000/api/usuarios/${usuario.id}`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(datos)
+        body: JSON.stringify(datos),
       });
 
       const result = await response.json();
 
       if (response.ok) {
-        alert("Registro exitoso 🎉");
-        navigate('/auth'); // Redirigir a la página de autenticación
+        alert("Perfil actualizado correctamente");
+        localStorage.setItem('usuario', JSON.stringify(datos)); // Actualizar localStorage con los nuevos datos
+        navigate('/');
       } else {
         alert(result.error);
       }
     } catch (error) {
-      console.error("Error en el registro:", error);
-      alert("Hubo un problema al registrar el usuario.");
+      console.error("Error al actualizar el perfil:", error);
+      alert("Hubo un problema al actualizar el perfil.");
     }
   };
 
   return (
     <div className="form-container">
-      <h2>Registro de Usuario</h2>
+      <h2>Editar Perfil</h2>
       <form onSubmit={handleSubmit} className="formulario">
         <label>Nombre</label>
         <input type="text" name="nombre" value={datos.nombre} onChange={handleChange} required />
 
         <label>Email</label>
-        <input type="email" name="email" value={datos.email} onChange={handleChange} required />
+        <input type="email" name="email" value={datos.email} onChange={handleChange} required disabled />
 
-        <label>Teléfono (opcional)</label>
+        <label>Teléfono</label>
         <input type="tel" name="telefono" value={datos.telefono} onChange={handleChange} />
-
-        <label>Contraseña</label>
-        <input type="password" name="password" value={datos.password} onChange={handleChange} required />
 
         <label>Selecciona tu avatar</label>
         <div className="avatar-selection">
@@ -84,13 +90,13 @@ const Registro = () => {
             />
           ))}
         </div>
-
         <img src={datos.avatar} alt="Vista previa" className="avatar-preview" />
 
-        <button type="submit">Registrar</button>
+        <button type="submit">Actualizar</button>
+        <button type="button" className="btn-cancelar" onClick={() => navigate('/')}>Cancelar</button>
       </form>
     </div>
   );
 };
 
-export default Registro;
+export default Perfil;

@@ -1,13 +1,15 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const usuario = JSON.parse(localStorage.getItem('usuario'));
+  const [usuario, setUsuario] = useState(JSON.parse(localStorage.getItem('usuario')));
 
   const handleLogout = () => {
-    localStorage.removeItem('usuario'); // Elimina la sesión
+    localStorage.removeItem('usuario');
+    setUsuario(null);
     alert("Sesión cerrada correctamente.");
-    navigate('/auth'); // Redirige a la página de autenticación
+    navigate('/auth');
   };
 
   return (
@@ -24,9 +26,32 @@ const Navbar = () => {
       </ul>
 
       {usuario ? (
-        <button className="logout-btn" onClick={handleLogout}>Cerrar Sesión</button>
+        <div className="perfil-container">
+          <img 
+            src={usuario.avatar || "/img/defecto.png"} 
+            alt="Avatar" 
+            className="avatar"
+            onClick={() => setMostrarPerfil(!mostrarPerfil)}
+          />
+          {mostrarPerfil && (
+            <div className="perfil-menu">
+              <p><strong>{usuario.nombre}</strong></p>
+              <p>📧 {usuario.email}</p>
+              <button className="btn-editar" onClick={() => navigate('/perfil')}>Editar Perfil</button>
+              <button className="btn-cerrar" onClick={handleLogout}>Cerrar Sesión</button>
+              <button className="btn-cancelar" onClick={() => setMostrarPerfil(false)}>Cancelar</button>
+            </div>
+          )}
+        </div>
       ) : (
-        <Link to="/auth" className="auth-button"></Link>
+        <div className="perfil-container">
+          <img 
+            src="/img/defecto.png" 
+            alt="Avatar" 
+            className="avatar"
+            onClick={() => navigate('/auth')}
+          />
+        </div>
       )}
     </nav>
   );

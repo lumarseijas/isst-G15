@@ -70,14 +70,13 @@ app.post('/api/reservas', (req, res) => {
 
 // Ruta para registrar usuarios
 app.post('/api/registro', async (req, res) => {
-    const { nombre, email, telefono, password } = req.body;
+    const { nombre, email, telefono, password, avatar } = req.body;
   
     // Encriptar la contraseña antes de guardarla
     const hashedPassword = await bcrypt.hash(password, 10);
   
-    const sql = 'INSERT INTO usuarios (nombre, email, telefono, password) VALUES (?, ?, ?, ?)';
-    db.query(sql, [nombre, email, telefono, hashedPassword], (err, result) => {
-      if (err) {
+    const sql = 'INSERT INTO usuarios (nombre, email, telefono, password, avatar) VALUES (?, ?, ?, ?, ?)';
+    db.query(sql, [nombre, email, telefono || null, hashedPassword, avatar], (err, result) => {      if (err) {
         console.error("Error al registrar usuario:", err);
         res.status(500).json({ error: "Error al registrar usuario" });
       } else {
@@ -142,6 +141,39 @@ app.post('/api/login', (req, res) => {
     });
   });
   
+//ruta obtener datos usuario
+  app.get('/api/usuarios/:id', (req, res) => {
+    const { id } = req.params;
+    const sql = 'SELECT nombre, email, telefono, avatar FROM usuarios WHERE id = ?';
+  
+    db.query(sql, [id], (err, result) => {
+      if (err) {
+        console.error('Error al obtener el usuario:', err);
+        return res.status(500).json({ error: 'Error al obtener el usuario' });
+      }
+      if (result.length === 0) {
+        return res.status(404).json({ error: 'Usuario no encontrado' });
+      }
+      res.json(result[0]);
+    });
+  });
+  
+//ruta para actualizar perfil usuario
+app.put('/api/usuarios/:id', (req, res) => {
+    const { id } = req.params;
+    const { nombre, telefono, avatar } = req.body;
+  
+    const sql = 'UPDATE usuarios SET nombre = ?, telefono = ?, avatar = ? WHERE id = ?';
+    db.query(sql, [nombre, telefono, avatar, id], (err, result) => {
+      if (err) {
+        console.error('Error al actualizar usuario:', err);
+        return res.status(500).json({ error: 'Error al actualizar usuario' });
+      }
+      res.json({ mensaje: 'Perfil actualizado correctamente' });
+    });
+  });
+  
+
 // Iniciar el servidor
 app.listen(5000, () => {
   console.log("Servidor corriendo en http://localhost:5000");
