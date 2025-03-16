@@ -32,7 +32,6 @@ CREATE TABLE reservas (
     cliente_online INT, -- Si es cliente online, referenciado a usuarios
     cliente_presencial VARCHAR(255), -- Si es cliente presencial, se guarda un nombre manualmente
     num_tlfno VARCHAR(20), -- Para clientes presenciales (podria quitarse pero no molesta)
-    trabajador_id INT NOT NULL, -- Referencia a la tabla trabajadores
     servicio_id INT NOT NULL, -- Referencia a la tabla servicios
     fecha_y_hora DATETIME NOT NULL,
     FOREIGN KEY (cliente_online) REFERENCES usuarios(id) ON DELETE SET NULL,
