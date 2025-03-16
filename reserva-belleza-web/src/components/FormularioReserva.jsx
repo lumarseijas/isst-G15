@@ -12,11 +12,20 @@ const FormularioReserva = () => {
   const [servicios, setServicios] = useState([]);
   const navigate = useNavigate();
 
+  // Cargar los servicios y el usuario logueado al iniciar
   useEffect(() => {
     fetch('http://localhost:5000/api/servicios')
       .then(response => response.json())
       .then(data => setServicios(data))
       .catch(error => console.error("Error al obtener los servicios:", error));
+
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    if (usuario) {
+      setDatos(prevDatos => ({
+        ...prevDatos,
+        nombre_cliente: usuario.nombre // Autorellenar el nombre
+      }));
+    }
   }, []);
 
   const handleChange = (e) => {
@@ -30,7 +39,7 @@ const FormularioReserva = () => {
 
     if (!usuario) {
       alert("Debes iniciar sesión o registrarte para reservar un servicio.");
-      navigate('/auth'); // Redirige a la página de autenticación en lugar de login
+      navigate('/auth'); // Redirige a la autenticación
       return;
     }
 
@@ -65,7 +74,14 @@ const FormularioReserva = () => {
       <h2>Reserva tu cita</h2>
       <form onSubmit={handleSubmit} className="formulario">
         <label>Nombre del Cliente *</label>
-        <input type="text" name="nombre_cliente" value={datos.nombre_cliente} onChange={handleChange} required />
+        <input 
+          type="text" 
+          name="nombre_cliente" 
+          value={datos.nombre_cliente} 
+          onChange={handleChange} 
+          required 
+          disabled={!!JSON.parse(localStorage.getItem('usuario'))} // Solo editable si no está logueado
+        />
 
         <label>Servicio *</label>
         <select name="servicio_id" value={datos.servicio_id} onChange={handleChange} required>
