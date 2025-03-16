@@ -34,6 +34,38 @@ app.get('/api/servicios', (req, res) => {
   });
 });
 
+// Ruta para obtener todos los servicios disponibles
+app.get('/api/servicios', (req, res) => {
+    db.query('SELECT id, nombre_servicio FROM servicios', (err, result) => {
+      if (err) {
+        console.error("❌ Error al obtener los servicios:", err);
+        res.status(500).json({ error: "Error al obtener los servicios" });
+      } else {
+        res.json(result);
+      }
+    });
+  });
+
+
+// Ruta para registrar una reserva
+app.post('/api/reservas', (req, res) => {
+    const { cliente_online, cliente_presencial, num_tlfno, trabajador_id, servicio_id, fecha_y_hora } = req.body;
+  
+    const sql = `
+      INSERT INTO reservas (cliente_online, cliente_presencial, num_tlfno, trabajador_id, servicio_id, fecha_y_hora)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
+  
+    db.query(sql, [cliente_online || null, cliente_presencial || null, num_tlfno || null, trabajador_id, servicio_id, fecha_y_hora], (err, result) => {
+      if (err) {
+        console.error("❌ Error al registrar la reserva:", err);
+        res.status(500).json({ error: "Error al registrar la reserva" });
+      } else {
+        res.json({ mensaje: "Reserva guardada correctamente" });
+      }
+    });
+  });
+
 // Iniciar el servidor
 app.listen(5000, () => {
   console.log("🚀 Servidor corriendo en http://localhost:5000");

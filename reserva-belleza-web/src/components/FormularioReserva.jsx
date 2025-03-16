@@ -2,87 +2,106 @@ import { useState, useEffect } from 'react';
 
 const FormularioReserva = () => {
   const [datos, setDatos] = useState({
-    nombre: '',
-    telefono: '',
-    servicio: '',
-    fecha: '',
-    hora: ''
+    tipo_cliente: 'online',
+    cliente_online: '',
+    cliente_presencial: '',
+    num_tlfno: '',
+    trabajador_id: '',
+    servicio_id: '',
+    fecha_y_hora: ''
   });
 
-  const [reservas, setReservas] = useState([]);
-  const [fechaMinima, setFechaMinima] = useState('');
+  const [servicios, setServicios] = useState([]); // Estado para almacenar los servicios
 
-  // Obtener la fecha actual en formato YYYY-MM-DD
+  // Obtener la lista de servicios desde el backend
   useEffect(() => {
-    const hoy = new Date();
-    const formatoFecha = hoy.toISOString().split('T')[0]; // Convierte a YYYY-MM-DD
-    setFechaMinima(formatoFecha);
+    fetch('http://localhost:5000/api/servicios')
+      .then(response => response.json())
+      .then(data => setServicios(data))
+      .catch(error => console.error("Error al obtener los servicios:", error));
   }, []);
 
-  // Manejar cambios en los inputs
   const handleChange = (e) => {
     setDatos({ ...datos, [e.target.name]: e.target.value });
   };
 
-  // Manejar envío del formulario
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!datos.nombre || !datos.servicio || !datos.fecha || !datos.hora) {
-      alert("Por favor, completa todos los campos obligatorios.");
+    if (!datos.servicio_id || !datos.trabajador_id || !datos.fecha_y_hora) {
+      alert("Por favor, complete todos los campos obligatorios.");
       return;
     }
 
-    const nuevaReserva = [...reservas, datos];
-    setReservas(nuevaReserva);
-    localStorage.setItem('reservas', JSON.stringify(nuevaReserva));
+    const reservaData = {
+      cliente_online: datos.tipo_cliente === 'online' ? datos.cliente_online : null,
+      cliente_presencial: datos.tipo_cliente === 'presencial' ? datos.cliente_presencial : null,
+      num_tlfno: datos.tipo_cliente === 'presencial' ? datos.num_tlfno : null,
+      trabajador_id: datos.trabajador_id,
+      servicio_id: datos.servicio_id,
+      fecha_y_hora: datos.fecha_y_hora
+    };
 
-    alert("Reserva realizada con éxito ✅");
-    setDatos({ nombre: '', telefono: '', servicio: '', fecha: '', hora: '' });
+    try {
+      const response = await fetch('http://localhost:5000/api/reservas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(reservaData)
+      });
+
+      const result = await response.json();
+      alert(result.mensaje);
+    } catch (error) {
+      console.error("Error en la reserva:", error);
+      alert("Hubo un problema al registrar la reserva.");
+    }
   };
 
   return (
     <div className="form-container">
-      <h2>Reservar una cita</h2>
-      <form onSubmit={handleSubmit} className="formulario-reserva">
-        <label>Nombre del Cliente *</label>
-        <input type="text" name="nombre" value={datos.nombre} onChange={handleChange} required />
-
-        <label>Teléfono (opcional)</label>
-        <input type="tel" name="telefono" value={datos.telefono} onChange={handleChange} placeholder="Opcional para clientes presenciales" />
-
-        <label>Servicio a Contratar *</label>
-        <select name="servicio" value={datos.servicio} onChange={handleChange} required>
-          <option value="">Selecciona un servicio</option>
-          <option value="Corte de Pelo">Corte de pelo</option>
-          <option value="Manicura">Manicura</option>
-          <option value="Tinte de Pelo">Tinte de Pelo</option>
-          <option value="Depilación Cera">Depilación Cera</option>
-          <option value="Peinado">Peinado</option>
-          <option value="Maquillaje">Maquillaje</option>
+      <h2>Reserva tu cita</h2>
+      <form onSubmit={handleSubmit} className="formulario">
+        <label>Tipo de Cliente</label>
+        <select name="tipo_cliente" value={datos.tipo_cliente} onChange={handleChange}>
+          <option value="online">Cliente Online</option>
+          <option value="presencial">Cliente Presencial</option>
         </select>
 
-        <label>Fecha *</label>
-        <input type="date" name="fecha" value={datos.fecha} onChange={handleChange} required min={fechaMinima} />
+        {datos.tipo_cliente === "online" && (
+          <>
+            <label>ID Cliente</label>
+            <input type="text" name="cliente_online" value={datos.cliente_online} onChange={handleChange} required />
+          </>
+        )}
 
-        <label>Hora *</label>
-        <input type="time" name="hora" value={datos.hora} onChange={handleChange} required min="09:00" max="21:00" />
+        {datos.tipo_cliente === "presencial" && (
+          <>
+            <label>Nombre Cliente Presencial</label>
+            <input type="text" name="cliente_presencial" value={datos.cliente_presencial} onChange={handleChange} required />
+
+            <label>Teléfono</label>
+            <input type="tel" name="num_tlfno" value={datos.num_tlfno} onChange={handleChange} />
+          </>
+        )}
+
+        <label>Trabajador</label>
+        <input type="text" name="trabajador_id" value={datos.trabajador_id} onChange={handleChange} required />
+
+        <label>Servicio</label>
+        <select name="servicio_id" value={datos.servicio_id} onChange={handleChange} required>
+          <option value="">Selecciona un servicio</option>
+          {servicios.map(servicio => (
+            <option key={servicio.id} value={servicio.id}>
+              {servicio.nombre_servicio}
+            </option>
+          ))}
+        </select>
+
+        <label>Fecha y Hora</label>
+        <input type="datetime-local" name="fecha_y_hora" value={datos.fecha_y_hora} onChange={handleChange} required />
 
         <button type="submit">Reservar</button>
       </form>
-
-      {reservas.length > 0 && (
-        <>
-          <h3>📅 Reservas Realizadas</h3>
-          <ul>
-            {reservas.map((reserva, index) => (
-              <li key={index}>
-                {reserva.nombre} - {reserva.servicio} - {reserva.fecha} a las {reserva.hora} {reserva.telefono && `(Tel: ${reserva.telefono})`}
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
     </div>
   );
 };
