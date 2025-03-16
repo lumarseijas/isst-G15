@@ -131,6 +131,17 @@ app.post('/api/login', (req, res) => {
     });
   });
   
+  app.get('/api/trabajadores', (req, res) => {
+    const sql = 'SELECT id, nombre FROM trabajadores';
+    db.query(sql, (err, result) => {
+      if (err) {
+        console.error('Error al obtener trabajadores:', err);
+        return res.status(500).json({ error: 'Error al obtener trabajadores' });
+      }
+      res.json(result);
+    });
+  });
+  
 // Iniciar el servidor
 app.listen(5000, () => {
   console.log("Servidor corriendo en http://localhost:5000");

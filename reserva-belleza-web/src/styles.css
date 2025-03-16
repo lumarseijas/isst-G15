@@ -288,3 +288,70 @@ button:hover {
   margin: auto;
   color: #444;
 }
+
+.contacto-container {
+  text-align: center;
+  padding: 40px;
+  width: 100%;
+}
+
+/* Contenedor principal en dos columnas */
+.contacto-grid {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  padding: 20px 5%;
+  box-sizing: border-box;
+}
+
+/* SECCIÓN IZQUIERDA: Horarios y Trabajadores */
+.info-izquierda {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+/* Horarios */
+.horarios h3, 
+.trabajadores-section h3 {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+/* Lista de Trabajadores */
+.trabajadores-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.trabajadores-section li {
+  font-size: 1.3rem;
+  margin: 8px 0;
+  padding: 5px 0;
+}
+
+/* SECCIÓN DERECHA: Mapa */
+.mapa-container {
+  flex: 1;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Dirección más arriba */
+.mapa-container .direccion {
+  margin-bottom: 10px;
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+/* Ajustes para el mapa */
+.mapa-container iframe {
+  width: 100%;
+  height: 450px;
+  border-radius: 10px;
+}
