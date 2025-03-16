@@ -7,8 +7,9 @@ import Contacto from "./pages/Contacto";
 import Admin from "./pages/Admin";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import Login from "./pages/Login";
-import Registro from "./pages/Registro";
+import AuthMenu from "./pages/AuthMenu";
+import Login from './pages/Login';
+import Registro from './pages/Registro';
 
 function App() {
   return (
@@ -16,12 +17,13 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/registro" element={<Registro />} />
         <Route path="/servicios" element={<Servicios />} />
         <Route path="/reservas" element={<Reservas />} />
         <Route path="/contacto" element={<Contacto />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/registro" element={<Registro />} />
+        <Route path="/auth" element={<AuthMenu />} />
       </Routes>
       <Footer />
     </>
