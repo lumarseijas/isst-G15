@@ -21,12 +21,13 @@ const Login = () => {
 
       const result = await response.json();
 
-      if (result.token) {
-        localStorage.setItem('usuario', JSON.stringify(result)); // Guardamos sesión
-        alert("Inicio de sesión exitoso ✅");
-        navigate('/reservas'); // Redirige al formulario de reservas
+      if (response.ok) {
+        localStorage.setItem('usuario', JSON.stringify(result.usuario)); // Guardar usuario en sesión
+        localStorage.setItem('token', result.token); // Guardar token
+        alert("Inicio de sesión exitoso");
+        navigate('/reservas'); // Redirige a la página de reservas
       } else {
-        alert("Credenciales incorrectas.");
+        alert(result.error); // Muestra mensaje de error
       }
     } catch (error) {
       console.error("Error en el inicio de sesión:", error);
