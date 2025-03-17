@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const Login = () => {
+const Login = ({ setUsuario }) => { /////////
   const [datos, setDatos] = useState({ email: '', password: '' });
   const navigate = useNavigate();
 
@@ -24,8 +24,11 @@ const Login = () => {
       if (response.ok) {
         // Guardar los datos del usuario en localStorage
         localStorage.setItem('usuario', JSON.stringify(result.usuario));
-        alert("Inicio de sesión exitoso ✅");
+        setUsuario(result.usuario); 
+        alert("Inicio de sesión exitoso");
+        //necesito que se recargue antes
         navigate('/'); // Redirige al usuario a la página principal
+        window.location.reload();
       } else {
         alert(result.error);
       }
@@ -49,7 +52,7 @@ const Login = () => {
       </form>
 
       <p className="registro-link">
-        ¿No estás registrado? <span onClick={() => navigate('/registro')}>Regístrate aquí</span>
+        ¿No estás registrado? Regístrate <span onClick={() => navigate('/registro')}>aquí</span>
       </p>
     </div>
   );

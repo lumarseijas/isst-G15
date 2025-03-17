@@ -93,7 +93,7 @@ const Perfil = () => {
               key={index}
               src={avatar}
               alt={`Avatar ${index + 1}`}
-              className={`avatar-option ${datos.avatar === avatar ? "selected" : ""}`} //aqui error
+              className={`avatar-option ${datos.avatar === avatar ? "selected" : ""}`} //aqui
               onClick={() => handleAvatarChange(avatar)}
             />
           ))}

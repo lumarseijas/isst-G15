@@ -35,7 +35,6 @@ CREATE TABLE reservas (
     servicio_id INT NOT NULL, -- Referencia a la tabla servicios
     fecha_y_hora DATETIME NOT NULL,
     FOREIGN KEY (cliente_online) REFERENCES usuarios(id) ON DELETE SET NULL,
-    FOREIGN KEY (trabajador_id) REFERENCES trabajadores(id) ON DELETE CASCADE,
     FOREIGN KEY (servicio_id) REFERENCES servicios(id) ON DELETE CASCADE
     -- lo del check no le convencia y lo he tenido que quitar para poder crear la tabla
     -- lo tendremos que poner en el backend 

@@ -11,20 +11,28 @@ import AuthMenu from "./pages/AuthMenu";
 import Login from './pages/Login';
 import Registro from './pages/Registro';
 import Perfil from './pages/Perfil';
-
+import { useState, useEffect } from 'react';
 
 function App() {
- 
+  const [usuario, setUsuario] = useState(null);
+
+  useEffect(() => {
+    const usuarioGuardado = JSON.parse(localStorage.getItem('usuario'));
+    if (usuarioGuardado) {
+      setUsuario(usuarioGuardado); // Recupera el usuario si está en localStorage
+    }
+  }, []);
+
   return (
     <>
-      <Navbar />
+      <Navbar usuario={usuario} setUsuario={setUsuario}/>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/servicios" element={<Servicios />} />
         <Route path="/reservas" element={<Reservas />} />
         <Route path="/contacto" element={<Contacto />} />
         <Route path="/admin" element={<Admin />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<Login setUsuario={setUsuario} />} />
         <Route path="/registro" element={<Registro />} />
         <Route path="/perfil" element={<Perfil />} />
         <Route path="/auth" element={<AuthMenu />} />

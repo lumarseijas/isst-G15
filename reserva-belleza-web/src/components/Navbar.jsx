@@ -12,14 +12,14 @@ const Navbar = () => {
     if (usuarioGuardado) {
       setUsuario(usuarioGuardado);
     }
-  }, []);
+  }, [setUsuario]);
 
   const handleLogout = () => {
     localStorage.removeItem('usuario'); // Eliminar usuario del almacenamiento
     setUsuario(null);
     setMostrarPerfil(false);
     alert("Sesión cerrada correctamente.");
-    navigate('/auth'); // Redirigir a la página de autenticación
+    window.location.reload(); // Refresca la página para actualizar el estado
   };
 
   return (
@@ -38,7 +38,7 @@ const Navbar = () => {
       {/* AVATAR - Menú de perfil */}
       <div className="perfil-container">
         <img 
-          src={usuario ? usuario.avatar || "/img/default-avatar.png" : "/img/default-avatar.png"} 
+          src={usuario ? usuario.avatar || "/img/defecto.png" : "/img/defecto.png"} 
           alt="Avatar" 
           className="avatar"
           onClick={() => {
