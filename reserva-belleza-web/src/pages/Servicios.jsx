@@ -10,7 +10,7 @@ const Servicios = () => {
       .then(data => setServicios(data))
       .catch(error => console.error("Error al obtener los servicios:", error));
   }, []);
-
+/*
   return (
     <div className="servicios-container">
       <h2>Lista de Servicios Disponibles</h2>
@@ -27,6 +27,31 @@ const Servicios = () => {
       </ul>
     </div>
   );
+};
+
+export default Servicios;*/
+
+return (
+  <div className="servicios-container">
+    <h2>Lista de Servicios Disponibles</h2>
+    <div className="servicios-grid">
+      {servicios.length > 0 ? (
+        servicios.map((servicio) => (
+          <div key={servicio.id} className="servicio-card">
+            <img src={servicio.imagen} alt={servicio.nombre_servicio} className="servicio-img" />
+            <div className="servicio-info">
+              <h3>{servicio.nombre_servicio}</h3>
+              <p>Duración: {servicio.duracion} min</p>
+              <p>Precio: {servicio.precio}€</p>
+            </div>
+          </div>
+        ))
+      ) : (
+        <p>Cargando servicios...</p>
+      )}
+    </div>
+  </div>
+);
 };
 
 export default Servicios;
