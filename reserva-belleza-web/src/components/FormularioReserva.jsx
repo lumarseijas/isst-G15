@@ -43,13 +43,14 @@ const FormularioReserva = () => {
       return;
     }
 
+    
     if (!datos.nombre_cliente || !datos.servicio_id || !datos.fecha || !datos.hora) {
       alert("Por favor, complete todos los campos obligatorios.");
       return;
     }
 
     const reservaData = {
-      nombre_cliente: datos.nombre_cliente,
+      cliente_online: usuario.id,
       servicio_id: datos.servicio_id,
       fecha_y_hora: `${datos.fecha} ${datos.hora}`
     };

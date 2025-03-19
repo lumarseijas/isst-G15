@@ -22,5 +22,5 @@ public class ServicioController {
     @PostMapping
     public Servicio crearServicio(@RequestBody Servicio servicio) {
         return servicioRepository.save(servicio);
-    }
+    }
 }

@@ -48,24 +48,27 @@ app.get('/api/servicios', (req, res) => {
     });
   });
 
-// Ruta para registrar una reserva
-app.post('/api/reservas', (req, res) => {
-    const { nombre_cliente, num_tlfno, servicio_id, fecha_y_hora } = req.body;
-  
+  app.post('/api/reservas', (req, res) => {
+    const { cliente_online, num_tlfno, servicio_id, fecha_y_hora } = req.body;
+
+    if (!cliente_online) {
+        return res.status(400).json({ error: "Falta el ID del cliente online." });
+    }
+
     const sql = `
       INSERT INTO reservas (cliente_online, num_tlfno, servicio_id, fecha_y_hora)
       VALUES (?, ?, ?, ?)
     `;
-  
-    db.query(sql, [nombre_cliente, num_tlfno || null, servicio_id, fecha_y_hora], (err, result) => {
+
+    db.query(sql, [cliente_online, num_tlfno || null, servicio_id, fecha_y_hora], (err, result) => {
       if (err) {
         console.error("Error al registrar la reserva:", err);
         res.status(500).json({ error: "Error al registrar la reserva" });
       } else {
-        res.json({ mensaje: "Reserva guardada correctamente" });
+        res.json({ mensaje: "Reserva guardada correctamente", reserva_id: result.insertId });
       }
     });
-  });
+});
 
 
 // Ruta para registrar usuarios

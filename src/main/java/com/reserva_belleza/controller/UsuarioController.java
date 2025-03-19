@@ -32,6 +32,6 @@ public class UsuarioController {
             return "Inicio de sesión exitoso";
         } else {
             return "Error en credenciales";
-        }
-    }
+     }
+  }
 }
