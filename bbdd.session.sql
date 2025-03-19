@@ -18,6 +18,7 @@ CREATE TABLE trabajadores (
     nombre VARCHAR(255) NOT NULL,
     telefono VARCHAR(20)
     );
+    
 
 -- Tabla de Servicios
 CREATE TABLE servicios (

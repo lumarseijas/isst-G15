@@ -35,7 +35,6 @@ app.get('/api/servicios', (req, res) => {
     }
   });
 });
-/////
 
 // Ruta para obtener todos los servicios disponibles
 app.get('/api/servicios', (req, res) => {
