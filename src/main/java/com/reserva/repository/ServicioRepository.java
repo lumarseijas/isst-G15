@@ -1,6 +1,6 @@
-package com.reserva_belleza.repository;
+package com.reserva.repository;
 
-import com.reserva_belleza.model.Servicio;
+import com.reserva.model.Servicio;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

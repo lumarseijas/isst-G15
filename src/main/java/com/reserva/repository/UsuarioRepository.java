@@ -1,12 +1,9 @@
-package com.reserva_belleza.repository;
+package com.reserva.repository;
 
-import com.reserva_belleza.model.Usuario;
+import com.reserva.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
 import java.util.Optional;
 
-@Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     Optional<Usuario> findByEmail(String email);
 }
