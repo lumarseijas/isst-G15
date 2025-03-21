@@ -1,0 +1,3 @@
+- USE DATABASE base;
+- base.sql es para crear las tablas de la base de datos
+- relleno.sql es el contenido de la base de datos
