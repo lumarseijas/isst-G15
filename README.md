@@ -6,6 +6,6 @@
 - que sabados y domingos no se pueda reservar
 - en el menu que se puedan ver las reservas
 - que el boton de actualizar actualice bien
-- creo q aun no estan encriptadas las contraseñas
+- creo q aun no estan encriptadas las contraseñas (es de este sprint?)
 - diferenciar roles
-- 
+- menu de citas
