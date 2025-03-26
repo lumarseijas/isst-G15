@@ -5,7 +5,7 @@ const Servicios = () => {
 
   // Obtener los servicios desde el backend
   useEffect(() => {
-    fetch('http://localhost:5000/api/servicios')  // Asegúrate de que esta ruta coincide con tu backend
+    fetch('http://localhost:5000/api/servicios') 
       .then(response => response.json())
       .then(data => setServicios(data))
       .catch(error => console.error("Error al obtener los servicios:", error));
