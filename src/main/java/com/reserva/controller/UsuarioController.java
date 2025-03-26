@@ -23,6 +23,37 @@ public class UsuarioController {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @GetMapping("/{id}") 
+    public ResponseEntity<?> obtenerUsuarioPorId(@PathVariable Long id) {
+    Optional<Usuario> usuarioOpt = usuarioService.obtenerPorId(id);
+    
+    if (usuarioOpt.isPresent()) {
+        return ResponseEntity.ok(usuarioOpt.get());
+    } else {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
+    }
+}
+
+@PutMapping("/{id}")
+public ResponseEntity<?> actualizarUsuario(@PathVariable Long id, @RequestBody Usuario datosActualizados) {
+    Optional<Usuario> usuarioOpt = usuarioService.obtenerPorId(id);
+
+    if (usuarioOpt.isPresent()) {
+        Usuario usuarioExistente = usuarioOpt.get();
+
+        // Solo actualizamos los campos permitidos
+        usuarioExistente.setNombre(datosActualizados.getNombre());
+        usuarioExistente.setTelefono(datosActualizados.getTelefono());
+        usuarioExistente.setAvatar(datosActualizados.getAvatar());
+
+        Usuario actualizado = usuarioService.guardarUsuario(usuarioExistente);
+        return ResponseEntity.ok(actualizado);
+    } else {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
+    }
+}
+
+
     //REGISTRO
     @PostMapping("/registro")
     public ResponseEntity<?> registrar(@RequestBody Usuario nuevoUsuario) {

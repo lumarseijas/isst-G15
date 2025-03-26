@@ -17,7 +17,7 @@ public class UsuarioService {
     public List<Usuario> obtenerTodos() {
         return usuarioRepository.findAll();
     }
-
+    
     public Optional<Usuario> obtenerPorId(Long id) {
         return usuarioRepository.findById(id);
     }

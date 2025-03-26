@@ -18,20 +18,28 @@ const Perfil = () => {
     avatar: ''
   });
 
-  // Cargar los datos del usuario
   useEffect(() => {
-    if (!usuarioGuardado) {
+    const storedUser = JSON.parse(localStorage.getItem('usuario'));
+    if (!storedUser || !storedUser.id) {
       navigate('/auth');
       return;
     }
-
-    console.log("Usuario guardado:", usuarioGuardado);  // para ver que id esta loggeado
-
-    fetch(`http://localhost:5000/api/usuarios/${usuarioGuardado.id}`)
+  
+    console.log("Usuario guardado:", storedUser);
+  
+    fetch(`http://localhost:5000/api/usuarios/${storedUser.id}`)
       .then(response => response.json())
-      .then(data => setDatos(data))
+      .then(data => {
+        const usuarioFormateado = {
+          nombre: data.nombre || '',
+          email: data.email || '',
+          telefono: data.telefono || '',
+          avatar: data.avatar || ''
+        };
+        setDatos(usuarioFormateado);
+      })
       .catch(error => console.error("Error al cargar los datos del usuario:", error));
-  }, [usuarioGuardado, navigate]);
+  }, [localStorage.getItem('usuario')]); // 👈 fuerza el efecto si cambia el usuario en localStorage
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -64,8 +72,12 @@ const Perfil = () => {
 
       if (response.ok) {
         alert("Perfil actualizado correctamente");
-        localStorage.setItem('usuario', JSON.stringify(datos)); // Guardar el nuevo avatar
+        localStorage.setItem('usuario', JSON.stringify({
+          ...usuarioGuardado,        
+          ...datos                  
+        }));
         navigate('/');
+        window.location.reload();
       } else {
         alert(result.error);
       }
@@ -74,6 +86,8 @@ const Perfil = () => {
       alert("Hubo un problema al actualizar el perfil.");
     }
   };
+
+  if (!datos.email) return <p>Cargando perfil...</p>;
 
   return (
     <div className="form-container">

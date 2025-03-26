@@ -17,7 +17,7 @@ const FormularioReserva = () => {
     fetch('http://localhost:5000/api/servicios')
       .then(response => response.json())
       .then(data => {
-        console.log("Servicios cargados en formulario:", data); // 🧪 debug
+        console.log("Servicios cargados en formulario:", data); // debug
         setServicios(data);
       })
       .catch(error => console.error("Error al obtener los servicios:", error));
