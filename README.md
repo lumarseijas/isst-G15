@@ -1,3 +1,11 @@
 - USE DATABASE base;
 - base.sql es para crear las tablas de la base de datos
 - relleno.sql es el contenido de la base de datos
+**COSAS POR CAMBIAR**
+- da error al reservar-no he mirado pq (500)
+- que sabados y domingos no se pueda reservar
+- en el menu que se puedan ver las reservas
+- que el boton de actualizar actualice bien
+- creo q aun no estan encriptadas las contraseñas
+- diferenciar roles
+- 

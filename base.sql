@@ -4,7 +4,7 @@ CREATE TABLE usuarios (
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     telefono VARCHAR(255),
-    tipo ENUM('administrador', 'cliente_online') NOT NULL DEFAULT 'cliente_online',
+    tipo ENUM('ADMINISTRADOR', 'CLIENTE_ONLINE') NOT NULL DEFAULT 'CLIENTE_ONLINE',
     avatar VARCHAR(255)
 );
 -- Tabla de Trabajadores (Lista gestionada por el administrador)

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const Login = ({ setUsuario }) => { /////////
+const Login = ({ setUsuario }) => {
   const [datos, setDatos] = useState({ email: '', password: '' });
   const navigate = useNavigate();
 
@@ -13,9 +13,10 @@ const Login = ({ setUsuario }) => { /////////
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:5000/api/login', {
+      const response = await fetch('http://localhost:5000/api/usuarios/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {//'Authorization': `Bearer ${token}`,
+                  'Content-Type': 'application/json' },
         body: JSON.stringify(datos)
       });
 
@@ -23,6 +24,7 @@ const Login = ({ setUsuario }) => { /////////
 
       if (response.ok) {
         // Guardar los datos del usuario en localStorage
+        localStorage.setItem('token', result.token);
         localStorage.setItem('usuario', JSON.stringify(result.usuario));
         setUsuario(result.usuario); 
         alert("Inicio de sesión exitoso");

@@ -16,7 +16,10 @@ const FormularioReserva = () => {
   useEffect(() => {
     fetch('http://localhost:5000/api/servicios')
       .then(response => response.json())
-      .then(data => setServicios(data))
+      .then(data => {
+        console.log("Servicios cargados en formulario:", data); // 🧪 debug
+        setServicios(data);
+      })
       .catch(error => console.error("Error al obtener los servicios:", error));
 
     const usuario = JSON.parse(localStorage.getItem('usuario'));
@@ -89,7 +92,7 @@ const FormularioReserva = () => {
           <option value="">Selecciona un servicio</option>
           {servicios.map(servicio => (
             <option key={servicio.id} value={servicio.id}>
-              {servicio.nombre_servicio}
+              {servicio.nombreServicio}
             </option>
           ))}
         </select>
