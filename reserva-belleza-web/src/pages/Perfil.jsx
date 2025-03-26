@@ -25,6 +25,8 @@ const Perfil = () => {
       return;
     }
 
+    console.log("Usuario guardado:", usuarioGuardado);  // para ver que id esta loggeado
+
     fetch(`http://localhost:5000/api/usuarios/${usuarioGuardado.id}`)
       .then(response => response.json())
       .then(data => setDatos(data))
@@ -78,13 +80,13 @@ const Perfil = () => {
       <h2>Editar Perfil</h2>
       <form onSubmit={handleSubmit} className="formulario">
         <label>Nombre</label>
-        <input type="text" name="nombre" defaultValue={datos.nombre} onChange={handleChange} required />
+        <input type="text" name="nombre" value={datos.nombre} onChange={handleChange} required />
 
         <label>Email</label>
         <input type="email" name="email" value={datos.email} onChange={handleChange} required disabled />
 
         <label>Teléfono</label>
-        <input type="tel" name="telefono" defaultValue={datos.telefono} onChange={handleChange} />
+        <input type="tel" name="telefono" value={datos.telefono} onChange={handleChange} />
 
         <label>Selecciona tu avatar</label>
         <div className="avatar-selection">
