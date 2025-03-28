@@ -33,6 +33,7 @@ const Navbar = () => {
         <li><Link to="/contacto">Contacto</Link></li>
         <li><Link to="/servicios">Servicios</Link></li>
         <li><Link to="/reservas">Reservar</Link></li>
+        <li><Link to="/Admin">Panel Administrador</Link></li>
       </ul>
 
       {/* AVATAR - Menú de perfil */}
