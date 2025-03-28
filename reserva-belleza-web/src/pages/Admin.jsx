@@ -18,8 +18,9 @@ const getSemanaConOffset = (offsetSemanas) => {
 const Admin = () => {
   const [trabajadores, setTrabajadores] = useState([]);
   const [trabajadoresVisibles, setTrabajadoresVisibles] = useState([]);
-  const [reservas, setReservas] = useState([]);
   const [servicios, setServicios] = useState([]);
+  const [serviciosVisibles, setServiciosVisibles] = useState([]);
+  const [reservas, setReservas] = useState([]);
   const [semanaOffset, setSemanaOffset] = useState(0);
   const [semana, setSemana] = useState(getSemanaConOffset(0));
 
@@ -31,18 +32,18 @@ const Admin = () => {
         setTrabajadores(trabajadoresRes.data);
         setTrabajadoresVisibles(trabajadoresRes.data.map((t) => t.id));
 
-        // Obtener servicios y asignar color a cada uno
+        // Obtener servicios y asignar colores
         const colores = ["#00BFFF", "#FF6347", "#32CD32", "#FF69B4", "#8A2BE2", "#FFA500", "#9370DB"];
         const serviciosRes = await axios.get("http://localhost:5000/api/servicios");
-        console.log("✅ Servicios cargados:", serviciosRes.data); // <-- debug aquí
         const serviciosConColor = serviciosRes.data.map((s, i) => ({
           ...s,
           color: colores[i % colores.length],
+          nombre: s.nombreServicio, // 👈 lo normalizamos
         }));
-        console.log("🎨 Servicios con color:", serviciosConColor); // <-- otro debug
         setServicios(serviciosConColor);
+        setServiciosVisibles(serviciosConColor.map((s) => s.id));
 
-        // Obtener reservas de esta semana
+        // Obtener reservas para la semana
         const { inicio, fin } = semana;
         const reservasRes = await axios.get(
           `http://localhost:5000/api/reservas/semana?inicio=${inicio}&fin=${fin}`
@@ -73,43 +74,58 @@ const Admin = () => {
     );
   };
 
-  const contarReservasTrabajador = (trabajadorId) => {
-    return reservas.filter((r) => r.trabajador && r.trabajador.id === trabajadorId).length;
+  const toggleServicio = (id) => {
+    setServiciosVisibles((prev) =>
+      prev.includes(id) ? prev.filter((sid) => sid !== id) : [...prev, id]
+    );
   };
+
+  const contarReservasTrabajador = (trabajadorId) => {
+    return reservas.filter((r) => r.trabajador?.id === trabajadorId).length;
+  };
+
+  const reservasFiltradas = reservas.filter(
+    (r) =>
+      trabajadoresVisibles.includes(r.trabajador?.id) &&
+      serviciosVisibles.includes(r.servicio?.id)
+  );
 
   return (
     <div className="admin-calendar-layout">
       <div className="sidebar">
-      <h3 style={{ marginBottom: "1rem" }}>Servicios</h3>
-<ul style={{ padding: 0, margin: 0 }}>
-  {servicios.map((s) => (
-    <li key={s.id}>
-      <label
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "0.5rem",
-          whiteSpace: "nowrap",
-          width: "100%",
-        }}
-      >
-        <input type="checkbox" checked={true} readOnly />
-        <span
-          style={{
-            display: "inline-block",
-            backgroundColor: s.color,
-            width: "10px",
-            height: "10px",
-            borderRadius: "50%",
-            flexShrink: 0,
-          }}
-        ></span>
-        <span style={{ flex: 1 }}>{s.nombreServicio}</span>
-      </label>
-    </li>
-  ))}
-</ul>
-
+        <h3 style={{ marginBottom: "1rem" }}>Servicios</h3>
+        <ul style={{ padding: 0, margin: 0 }}>
+          {servicios.map((s) => (
+            <li key={s.id}>
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  whiteSpace: "nowrap",
+                  width: "100%",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={serviciosVisibles.includes(s.id)}
+                  onChange={() => toggleServicio(s.id)}
+                />
+                <span
+                  style={{
+                    display: "inline-block",
+                    backgroundColor: s.color,
+                    width: "10px",
+                    height: "10px",
+                    borderRadius: "50%",
+                    flexShrink: 0,
+                  }}
+                ></span>
+                <span style={{ flex: 1 }}>{s.nombre}</span>
+              </label>
+            </li>
+          ))}
+        </ul>
 
         <h3 style={{ marginTop: "1rem" }}>Trabajadores</h3>
         <ul style={{ padding: 0, margin: 0 }}>
@@ -125,7 +141,6 @@ const Admin = () => {
               >
                 <input
                   type="checkbox"
-                  autoComplete="off"
                   checked={trabajadoresVisibles.includes(t.id)}
                   onChange={() => toggleTrabajador(t.id)}
                 />
@@ -147,7 +162,7 @@ const Admin = () => {
       <div className="calendar-container">
         <AdminCalendar
           trabajadores={trabajadores.filter((t) => trabajadoresVisibles.includes(t.id))}
-          reservas={reservas}
+          reservas={reservasFiltradas}
           servicios={servicios}
           semana={semana}
         />
