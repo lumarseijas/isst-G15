@@ -1,15 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-/*import DatePicker from "react-multi-date-picker";
-import TimePicker from "react-multi-date-picker/plugins/time_picker";
-*/
-/*
-import TimePicker from 'react-time-picker';
-import 'react-time-picker/dist/TimePicker.css';
-import 'react-clock/dist/Clock.css';
-*/
-
 const FormularioReserva = () => {
   const [datos, setDatos] = useState({
     nombre_cliente: '',
@@ -24,6 +15,7 @@ const FormularioReserva = () => {
   const [errorFecha, setErrorFecha] = useState('');
   const [errorHora, setErrorHora] = useState('');
   const [mostrarErrores, setMostrarErrores] = useState(false);
+  const [errorReserva, setErrorReserva] = useState('');
 
 
 
@@ -53,24 +45,24 @@ const FormularioReserva = () => {
     if (name === 'hora') {
       const [h, m] = value.split(':').map(Number);
       const horaValida = h >= 9 && h <= 21;
-    
+
       if (!horaValida) {
         setErrorHora("Selecciona una hora entre las 09:00 y las 21:00.");
       } else {
         setErrorHora('');
       }
     }
-    
+
     if (name === 'fecha') {
       const seleccionada = new Date(value);
       const hoy = new Date();
       hoy.setHours(0, 0, 0, 0);
-  
+
       const mañana = new Date(hoy);
       mañana.setDate(hoy.getDate() + 1);
-  
+
       const dia = seleccionada.getDay(); // 0 = domingo, 6 = sábado
-  
+
       if (seleccionada < mañana) {
         setFechaValida(false);
         setErrorFecha("No puedes seleccionar una fecha anterior a mañana.");
@@ -82,11 +74,10 @@ const FormularioReserva = () => {
         setErrorFecha('');
       }
     }
-  
     setDatos({ ...datos, [name]: value });
   };
 
-  
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -96,7 +87,7 @@ const FormularioReserva = () => {
       alert("Corrige los errores del formulario antes de continuar.");
       return;
     }
-    
+
     const usuario = JSON.parse(localStorage.getItem('usuario'));
 
     if (!usuario) {
@@ -105,7 +96,7 @@ const FormularioReserva = () => {
       return;
     }
 
-    
+
     if (!datos.nombre_cliente || !datos.servicio_id || !datos.fecha || !datos.hora) {
       alert("Por favor, complete todos los campos obligatorios.");
       return;
@@ -117,7 +108,7 @@ const FormularioReserva = () => {
       fechaYHora: `${datos.fecha}T${datos.hora}` // Formato ISO: yyyy-MM-ddTHH:mm
     };
 
-    try {
+    /*try {
       const response = await fetch('http://localhost:5000/api/reservas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -129,11 +120,35 @@ const FormularioReserva = () => {
     } catch (error) {
       console.error("Error en la reserva:", error);
       alert("Hubo un problema al registrar la reserva.");
+    }*/
+
+    try {
+      const response = await fetch('http://localhost:5000/api/reservas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(reservaData)
+      });
+
+      if (response.status === 409) {
+        // Este 409 viene del backend cuando no hay trabajadores disponibles
+        const mensaje = await response.text();
+        setErrorReserva(mensaje); // Mostrar mensaje debajo del formulario
+        return;
+      }
+
+      const result = await response.json();
+      alert("Reserva realizada con éxito");
+
+      // Limpiar errores visuales si todo ha ido bien
+      setErrorReserva('');
+    } catch (error) {
+      console.error("Error en la reserva:", error);
+      setErrorReserva("Hubo un problema al registrar la reserva.");
     }
   };
 
 
-  const formularioValido = 
+  const formularioValido =
     datos.nombre_cliente.trim() !== '' &&
     datos.servicio_id.trim() !== '' &&
     datos.fecha.trim() !== '' &&
@@ -147,13 +162,13 @@ const FormularioReserva = () => {
       <h2>Reserva tu cita</h2>
       <form onSubmit={handleSubmit} className="formulario">
         <label>Nombre del Cliente *</label>
-        
-        <input 
-          type="text" 
-          name="nombre_cliente" 
-          value={datos.nombre_cliente} 
-          onChange={handleChange} 
-          required 
+
+        <input
+          type="text"
+          name="nombre_cliente"
+          value={datos.nombre_cliente}
+          onChange={handleChange}
+          required
           disabled={!!JSON.parse(localStorage.getItem('usuario'))} // Solo editable si no está logueado
         />
 
@@ -165,74 +180,60 @@ const FormularioReserva = () => {
           required
           className={mostrarErrores && datos.servicio_id === '' ? 'input-error' : ''}
         >
-        <option value="">Selecciona un servicio</option>
+          <option value="">Selecciona un servicio</option>
           {servicios.map(servicio => (
             <option key={servicio.id} value={servicio.id}>
               {servicio.nombreServicio}
             </option>
           ))}
         </select>
-        
 
         <div className="form-row">
-  <label>Fecha *
-    {errorFecha && <span className="inline-error">{errorFecha}</span>}
-  </label>
+          <label>Fecha *
+            {errorFecha && <span className="inline-error">{errorFecha}</span>}
+          </label>
 
+          <input
+            type="date"
+            name="fecha"
+            value={datos.fecha}
+            onChange={handleChange}
+            required
+            min={(() => {
+              const fechaMinima = new Date();
+              fechaMinima.setDate(fechaMinima.getDate() + 1);
+              return fechaMinima.toISOString().split('T')[0];
+            })()}
+          />
+        </div>
 
-
-
-
-  <input
-    type="date"
-    name="fecha"
-    value={datos.fecha}
-    onChange={handleChange}
-    required
-    min={(() => {
-      const fechaMinima = new Date();
-      fechaMinima.setDate(fechaMinima.getDate() + 1);
-      return fechaMinima.toISOString().split('T')[0];
-    })()}
-  />
-</div>
-
-<div className="form-row">
-  <label>Hora *
-    {errorHora && <span className="inline-error">{errorHora}</span>}
-  </label>
-  <input
-    type="time"
-    name="hora"
-    value={datos.hora}
-    onChange={handleChange}
-    required
-    min="09:00"
-    max="21:00"
-    step="300"
-  />
-
-
-
-  <div>
-  
-  </div>  
-  
-
-
-</div>
-
-
-        
-   {!formularioValido && (
-  <span className="error-text">
-    Asegúrate de haber rellenado todos los campos correctamente.
-  </span>
-)}
+        <div className="form-row">
+          <label>Hora *
+            {errorHora && <span className="inline-error">{errorHora}</span>}
+          </label>
+          <input
+            type="time"
+            name="hora"
+            value={datos.hora}
+            onChange={handleChange}
+            required
+            min="09:00"
+            max="21:00"
+            step="300"
+          />
+        </div>
+        {!formularioValido && (
+          <span className="error-text">
+            Asegúrate de haber rellenado todos los campos correctamente.
+          </span>
+        )}
+        {errorReserva && (
+          <span className="error-text">{errorReserva}</span>
+        )}
         <button type="submit" disabled={!formularioValido}>Reservar</button>
       </form>
     </div>
   );
-}; 
+};
 
 export default FormularioReserva;

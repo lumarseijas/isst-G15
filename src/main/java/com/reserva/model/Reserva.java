@@ -28,6 +28,10 @@ public class Reserva {
     @Column(name = "fecha_y_hora", nullable = false)
     private LocalDateTime fechaYHora; // Fecha y hora de la reserva
 
+    @ManyToOne
+    @JoinColumn(name = "trabajador_id")
+    private Trabajador trabajador;
+
     public Reserva() {}
 
     public Reserva(Usuario clienteOnline, String clientePresencial, String numTlfno, Servicio servicio, LocalDateTime fechaYHora) {
@@ -55,4 +59,8 @@ public class Reserva {
 
     public LocalDateTime getFechaYHora() { return fechaYHora; }
     public void setFechaYHora(LocalDateTime fechaYHora) { this.fechaYHora = fechaYHora; }
+
+    public Trabajador getTrabajador() { return trabajador; }
+    public void setTrabajador(Trabajador trabajador) { this.trabajador = trabajador; }
+
 }
