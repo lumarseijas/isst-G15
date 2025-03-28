@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -114,4 +115,16 @@ public class ReservaController {
         LocalDateTime endDate = LocalDateTime.parse(fin);
         return reservaService.obtenerReservasPorFecha(startDate, endDate);
     }
+
+    @GetMapping("/semana")
+    public List<Reserva> obtenerReservasSemana(
+        @RequestParam String inicio,
+        @RequestParam String fin) {
+    
+        LocalDateTime startDate = LocalDate.parse(inicio).atStartOfDay();
+        LocalDateTime endDate = LocalDate.parse(fin).atTime(23, 59);
+
+        return reservaService.obtenerReservasPorFecha(startDate, endDate);
+    }
+    
 }
