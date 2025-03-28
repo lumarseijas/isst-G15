@@ -510,3 +510,44 @@ button:hover {
   height: 450px;
   border-radius: 10px;
 }
+
+/* Los warning de errores  para las reservas*/
+.error-text {
+  color: red;
+  font-size: 0.9rem;
+  margin-top: 4px;
+  display: block;
+}
+
+.input-error {
+  border-color: red;
+  border: 2px solid red;
+}
+
+.react-time-picker {
+  width: 100%;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.form-row label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+}
+
+.inline-error {
+  color: red;
+  font-size: 0.8rem;
+  margin-left: 1rem;
+}
