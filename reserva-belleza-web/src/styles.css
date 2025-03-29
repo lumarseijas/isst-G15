@@ -551,3 +551,46 @@ button:disabled {
   font-size: 0.8rem;
   margin-left: 1rem;
 }
+
+
+/*MIS CITAS*/
+
+.citas-wrapper {
+  text-align: center;
+  padding: 2rem;
+}
+
+.titulo-citas {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: var(--color-texto);
+}
+
+.tarjetas-citas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.tarjeta-cita {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  width: 280px;
+  text-align: left;
+  transition: transform 0.2s;
+}
+
+.tarjeta-cita h3 {
+  color: var(--color-primario);
+  margin-bottom: 10px;
+}
+
+.texto-vacio {
+  font-size: 1.2rem;
+  color: gray;
+  margin-top: 2rem;
+}
+

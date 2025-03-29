@@ -114,4 +114,10 @@ public class ReservaController {
         LocalDateTime endDate = LocalDateTime.parse(fin);
         return reservaService.obtenerReservasPorFecha(startDate, endDate);
     }
+
+    @GetMapping("/cliente/{clienteId}")
+    public List<Reserva> obtenerPorCliente(@PathVariable Long clienteId) {
+        return reservaService.obtenerPorClienteId(clienteId);
+    }
+
 }

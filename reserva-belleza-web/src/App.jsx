@@ -12,6 +12,8 @@ import Login from './pages/Login';
 import Registro from './pages/Registro';
 import Perfil from './pages/Perfil';
 import { useState, useEffect } from 'react';
+import Citas from './pages/Citas';
+
 
 function App() {
   const [usuario, setUsuario] = useState(null);
@@ -36,7 +38,7 @@ function App() {
         <Route path="/registro" element={<Registro />} />
         <Route path="/perfil" element={<Perfil />} />
         <Route path="/auth" element={<AuthMenu />} />
-
+        <Route path="/citas" element={<Citas />} />
       </Routes>
       <Footer />
     </>

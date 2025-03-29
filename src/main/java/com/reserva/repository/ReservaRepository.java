@@ -16,5 +16,6 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     List<Reserva> findByTrabajadorAndFechaYHoraBetween(Trabajador trabajador, LocalDateTime desde, LocalDateTime hasta);
     boolean existsByTrabajadorAndFechaYHora(Trabajador trabajador, LocalDateTime fechaYHora);
     List<Reserva> findByClienteOnlineAndFechaYHoraBetween(Usuario clienteOnline, LocalDateTime desde, LocalDateTime hasta);
+    List<Reserva> findByClienteOnlineId(Long clienteId);
 
 }

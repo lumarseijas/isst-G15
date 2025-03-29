@@ -85,6 +85,10 @@ public boolean clienteTieneReservaEnEseHorario(Usuario cliente, LocalDateTime in
     return false;
 }
 
+public List<Reserva> obtenerPorClienteId(Long clienteId) {
+    return reservaRepository.findByClienteOnlineId(clienteId);
+}
+
 
     
 
