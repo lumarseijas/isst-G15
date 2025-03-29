@@ -1,60 +1,172 @@
-// src/pages/AdminPanel.jsx
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import AdminCalendar from "../components/AdminCalendar";
+
+const getSemanaConOffset = (offsetSemanas) => {
+  const hoy = new Date();
+  const dia = hoy.getDay() || 7;
+  const lunes = new Date(hoy);
+  lunes.setDate(hoy.getDate() - dia + 1 + offsetSemanas * 7);
+  const viernes = new Date(lunes);
+  viernes.setDate(lunes.getDate() + 4);
+  return {
+    inicio: lunes.toISOString().split("T")[0],
+    fin: viernes.toISOString().split("T")[0],
+  };
+};
 
 const Admin = () => {
-  const navigate = useNavigate();
-  const [usuarios, setUsuarios] = useState([]);
-  const [reservas, setReservas] = useState([]);
+  const [trabajadores, setTrabajadores] = useState([]);
+  const [trabajadoresVisibles, setTrabajadoresVisibles] = useState([]);
   const [servicios, setServicios] = useState([]);
+  const [serviciosVisibles, setServiciosVisibles] = useState([]);
+  const [reservas, setReservas] = useState([]);
+  const [semanaOffset, setSemanaOffset] = useState(0);
+  const [semana, setSemana] = useState(getSemanaConOffset(0));
 
   useEffect(() => {
-    // Aquí iría la lógica para obtener usuarios, reservas y servicios desde el backend
-    // Por ahora, usamos datos de ejemplo
-    setUsuarios([{ id: 1, nombre: "Lucía", email: "lucia@upm.es" }]);
-    setReservas([{ id: 1, cliente: "Lucía", fecha: "2025-03-28", servicio: "Peinado" }]);
-    setServicios([{ id: 1, nombre: "Corte", precio: 20 }]);
-  }, []);
+    const fetchData = async () => {
+      try {
+        // Obtener trabajadores
+        const trabajadoresRes = await axios.get("http://localhost:5000/api/trabajadores");
+        setTrabajadores(trabajadoresRes.data);
+        setTrabajadoresVisibles(trabajadoresRes.data.map((t) => t.id));
+
+        // Obtener servicios y asignar colores
+        const colores = ["#00BFFF", "#FF6347", "#32CD32", "#FF69B4", "#8A2BE2", "#FFA500", "#9370DB"];
+        const serviciosRes = await axios.get("http://localhost:5000/api/servicios");
+        const serviciosConColor = serviciosRes.data.map((s, i) => ({
+          ...s,
+          color: colores[i % colores.length],
+          nombre: s.nombreServicio, // 👈 lo normalizamos
+        }));
+        setServicios(serviciosConColor);
+        setServiciosVisibles(serviciosConColor.map((s) => s.id));
+
+        // Obtener reservas para la semana
+        const { inicio, fin } = semana;
+        const reservasRes = await axios.get(
+          `http://localhost:5000/api/reservas/semana?inicio=${inicio}&fin=${fin}`
+        );
+        setReservas(reservasRes.data);
+      } catch (err) {
+        console.error("Error al cargar datos:", err);
+      }
+    };
+
+    fetchData();
+  }, [semana]);
+
+  const cambiarSemana = (offset) => {
+    const nuevoOffset = semanaOffset + offset;
+    setSemanaOffset(nuevoOffset);
+    setSemana(getSemanaConOffset(nuevoOffset));
+  };
+
+  const volverASemanaActual = () => {
+    setSemanaOffset(0);
+    setSemana(getSemanaConOffset(0));
+  };
+
+  const toggleTrabajador = (id) => {
+    setTrabajadoresVisibles((prev) =>
+      prev.includes(id) ? prev.filter((tid) => tid !== id) : [...prev, id]
+    );
+  };
+
+  const toggleServicio = (id) => {
+    setServiciosVisibles((prev) =>
+      prev.includes(id) ? prev.filter((sid) => sid !== id) : [...prev, id]
+    );
+  };
+
+  const contarReservasTrabajador = (trabajadorId) => {
+    return reservas.filter((r) => r.trabajador?.id === trabajadorId).length;
+  };
+
+  const reservasFiltradas = reservas.filter(
+    (r) =>
+      trabajadoresVisibles.includes(r.trabajador?.id) &&
+      serviciosVisibles.includes(r.servicio?.id)
+  );
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Panel del Administrador</h1>
-
-      {/* Usuarios */}
-      <section className="mb-6">
-        <h2 className="text-xl font-semibold">Usuarios registrados</h2>
-        <ul>
-          {usuarios.map((u) => (
-            <li key={u.id}>{u.nombre} - {u.email}</li>
-          ))}
-        </ul>
-      </section>
-
-      {/* Reservas */}
-      <section className="mb-6">
-        <h2 className="text-xl font-semibold">Reservas</h2>
-        <ul>
-          {reservas.map((r) => (
-            <li key={r.id}>{r.cliente} - {r.servicio} - {r.fecha}</li>
-          ))}
-        </ul>
-      </section>
-
-      {/* Servicios */}
-      <section className="mb-6">
-        <h2 className="text-xl font-semibold">Servicios</h2>
-        <ul>
+    <div className="admin-calendar-layout">
+      <div className="sidebar">
+        <h3 style={{ marginBottom: "1rem" }}>Servicios</h3>
+        <ul style={{ padding: 0, margin: 0 }}>
           {servicios.map((s) => (
-            <li key={s.id}>{s.nombre} - {s.precio}€</li>
+            <li key={s.id}>
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  whiteSpace: "nowrap",
+                  width: "100%",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={serviciosVisibles.includes(s.id)}
+                  onChange={() => toggleServicio(s.id)}
+                />
+                <span
+                  style={{
+                    display: "inline-block",
+                    backgroundColor: s.color,
+                    width: "10px",
+                    height: "10px",
+                    borderRadius: "50%",
+                    flexShrink: 0,
+                  }}
+                ></span>
+                <span style={{ flex: 1 }}>{s.nombre}</span>
+              </label>
+            </li>
           ))}
         </ul>
-        <button
-          className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
-          onClick={() => navigate("/admin/servicios")}
-        >
-          Gestionar Servicios
-        </button>
-      </section>
+
+        <h3 style={{ marginTop: "1rem" }}>Trabajadores</h3>
+        <ul style={{ padding: 0, margin: 0 }}>
+          {trabajadores.map((t) => (
+            <li key={t.id}>
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={trabajadoresVisibles.includes(t.id)}
+                  onChange={() => toggleTrabajador(t.id)}
+                />
+                <span>
+                  {t.nombre} ({contarReservasTrabajador(t.id)})
+                </span>
+              </label>
+            </li>
+          ))}
+        </ul>
+
+        <div style={{ marginTop: "1rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+          <button onClick={() => cambiarSemana(-1)}>← Semana anterior</button>
+          <button onClick={volverASemanaActual}>Semana actual</button>
+          <button onClick={() => cambiarSemana(1)}>Semana siguiente →</button>
+        </div>
+      </div>
+
+      <div className="calendar-container">
+        <AdminCalendar
+          trabajadores={trabajadores.filter((t) => trabajadoresVisibles.includes(t.id))}
+          reservas={reservasFiltradas}
+          servicios={servicios}
+          semana={semana}
+        />
+      </div>
     </div>
   );
 };

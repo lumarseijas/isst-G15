@@ -553,6 +553,7 @@ button:disabled {
 }
 
 
+<<<<<<< HEAD
 /*MIS CITAS*/
 
 .citas-wrapper {
@@ -594,3 +595,107 @@ button:disabled {
   margin-top: 2rem;
 }
 
+/*CALENDARIO ADMIN*/
+.admin-calendar {
+  padding: 2rem;
+  overflow-x: auto;
+}
+
+.tabla-calendario {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.tabla-calendario th,
+.tabla-calendario td {
+  border: 1px solid #ccc;
+  text-align: center;
+  min-width: 100px;
+  height: 40px;
+  padding: 2px;
+}
+
+.bloque-reserva {
+  height: 100%;
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: white;
+  border-radius: 4px;
+}
+
+/* admin panel */
+.admin-calendar-layout {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+  padding: 1rem 1rem 1rem 0; 
+}
+
+.sidebar {
+  width: 220px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 0;
+  margin-left: 0 !important;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; 
+}
+
+.sidebar ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  width: 20%;             
+}
+
+.sidebar li {
+  margin-bottom: 0.75rem;
+  width: 100%;
+  text-align: left;
+}
+
+
+.sidebar label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  justify-content: flex-start;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.sidebar span {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+
+
+.calendar-container {
+  flex: 1;
+  overflow-x: auto;
+}
+
+.tabla-calendario td {
+  height: 40px;
+  vertical-align: top;
+}
+
+.bloque-reserva {
+  padding: 8px;
+  color: white;
+  font-weight: bold;
+  border-radius: 4px;
+  height: 100%;
+  box-sizing: border-box;
+}
+>>>>>>> 74c14db2906c40a2010616fd2019748fa3d3a0e2
