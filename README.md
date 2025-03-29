@@ -1,11 +1,15 @@
-- USE DATABASE base;
-- base.sql es para crear las tablas de la base de datos
-- relleno.sql es el contenido de la base de datos
-**COSAS POR CAMBIAR**
-- da error al reservar-no he mirado pq (500)
-- que sabados y domingos no se pueda reservar
-- en el menu que se puedan ver las reservas
-- que el boton de actualizar actualice bien
-- creo q aun no estan encriptadas las contraseñas (es de este sprint?)
-- diferenciar roles
-- menu de citas
+**RESERVA BELLEZA:**
+1. Se necesitan: tener instalado: 
+- MYSQL: https://dev.mysql.com/downloads/installer/ 
+- JAVA: https://adoptium.net/es/ 
+- MAVEN: https://maven.apache.org/download.cgi (el zip) 
+2. Se necesita tener 
+- carpeta de node_modules (en reserva-belleza-web)
+- la base de datos q se llama base con las tablas completas por el relleno.sql
+3. Instalar:
+- npm install axios
+- npm install react-router-dom 
+- npm install
+4. Para ver la página web: 
+- (en la carpeta de reserva-belleza-web) npm run dev
+- en el navegador: http://localhost:5173
