@@ -58,7 +58,9 @@ const Navbar = () => {
           <div className="perfil-menu">
             <p><strong>{usuario.nombre}</strong></p>
             <p>📧 {usuario.email}</p>
+            {usuario?.tipo !== "ADMINISTRADOR" && (
             <button className="btn-editar" onClick={() => navigate('/citas')}>Mis citas</button>
+            )}
             <button className="btn-editar" onClick={() => navigate('/perfil')}>Editar Perfil</button>
             <button className="btn-cerrar" onClick={handleLogout}>Cerrar Sesión</button>
             <button className="btn-cancelar" onClick={() => setMostrarPerfil(false)}>Cancelar</button>
