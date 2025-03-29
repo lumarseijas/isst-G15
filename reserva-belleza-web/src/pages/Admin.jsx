@@ -24,31 +24,36 @@ const Admin = () => {
   const [semanaOffset, setSemanaOffset] = useState(0);
   const [semana, setSemana] = useState(getSemanaConOffset(0));
 
+  const fetchReservas = async () => {
+    try {
+      const { inicio, fin } = semana;
+      const reservasRes = await axios.get(
+        `http://localhost:5000/api/reservas/semana?inicio=${inicio}&fin=${fin}`
+      );
+      setReservas(reservasRes.data);
+    } catch (err) {
+      console.error("Error al recargar reservas:", err);
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Obtener trabajadores
         const trabajadoresRes = await axios.get("http://localhost:5000/api/trabajadores");
         setTrabajadores(trabajadoresRes.data);
         setTrabajadoresVisibles(trabajadoresRes.data.map((t) => t.id));
 
-        // Obtener servicios y asignar colores
         const colores = ["#00BFFF", "#FF6347", "#32CD32", "#FF69B4", "#8A2BE2", "#FFA500", "#9370DB"];
         const serviciosRes = await axios.get("http://localhost:5000/api/servicios");
         const serviciosConColor = serviciosRes.data.map((s, i) => ({
           ...s,
           color: colores[i % colores.length],
-          nombre: s.nombreServicio, // 👈 lo normalizamos
+          nombre: s.nombreServicio,
         }));
         setServicios(serviciosConColor);
         setServiciosVisibles(serviciosConColor.map((s) => s.id));
 
-        // Obtener reservas para la semana
-        const { inicio, fin } = semana;
-        const reservasRes = await axios.get(
-          `http://localhost:5000/api/reservas/semana?inicio=${inicio}&fin=${fin}`
-        );
-        setReservas(reservasRes.data);
+        fetchReservas();
       } catch (err) {
         console.error("Error al cargar datos:", err);
       }
@@ -165,6 +170,7 @@ const Admin = () => {
           reservas={reservasFiltradas}
           servicios={servicios}
           semana={semana}
+          recargarReservas={fetchReservas}
         />
       </div>
     </div>
