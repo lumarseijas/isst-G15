@@ -1,5 +1,4 @@
-
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Servicios from "./pages/Servicios";
 import Reservas from "./pages/Reservas";
@@ -33,7 +32,7 @@ function App() {
         <Route path="/servicios" element={<Servicios />} />
         <Route path="/reservas" element={<Reservas />} />
         <Route path="/contacto" element={<Contacto />} />
-        <Route path="/admin" element={<Admin />} />
+        <Route path="/admin" element={usuario?.tipo === "ADMINISTRADOR" ? ( <Admin />):( <Navigate to="/" replace />)} />
         <Route path="/login" element={<Login setUsuario={setUsuario} />} />
         <Route path="/registro" element={<Registro />} />
         <Route path="/perfil" element={<Perfil />} />

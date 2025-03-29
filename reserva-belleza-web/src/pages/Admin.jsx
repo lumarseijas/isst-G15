@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AdminCalendar from "../components/AdminCalendar";
+import { useNavigate } from "react-router-dom";
 
 const getSemanaConOffset = (offsetSemanas) => {
   const hoy = new Date();
@@ -23,6 +24,8 @@ const Admin = () => {
   const [reservas, setReservas] = useState([]);
   const [semanaOffset, setSemanaOffset] = useState(0);
   const [semana, setSemana] = useState(getSemanaConOffset(0));
+  const navigate = useNavigate();
+
 
   const fetchReservas = async () => {
     try {
@@ -158,10 +161,28 @@ const Admin = () => {
         </ul>
 
         <div style={{ marginTop: "1rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-          <button onClick={() => cambiarSemana(-1)}>← Semana anterior</button>
-          <button onClick={volverASemanaActual}>Semana actual</button>
-          <button onClick={() => cambiarSemana(1)}>Semana siguiente →</button>
-        </div>
+        <button
+  onClick={() => navigate("/reservas")}
+  style={{
+    backgroundColor: "#b48ec6",
+    color: "white",
+    padding: "10px 15px",
+    border: "none",
+    borderRadius: "20px",
+    fontSize: "1rem",
+    fontWeight: "bold",
+    cursor: "pointer"
+  }}
+>
+  ➕ Añadir cita
+</button>
+
+
+  <button onClick={() => cambiarSemana(-1)}>← Semana anterior</button>
+  <button onClick={volverASemanaActual}>Semana actual</button>
+  <button onClick={() => cambiarSemana(1)}>Semana siguiente →</button>
+</div>
+
       </div>
 
       <div className="calendar-container">

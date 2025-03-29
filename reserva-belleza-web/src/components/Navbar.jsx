@@ -25,7 +25,7 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="logo">
-        <Link to="/">RESERVA BELLEZA</Link>
+        <Link to="/">CENTRO BELLEZA</Link>
       </div>
 
       <ul className="nav-links">
@@ -33,7 +33,9 @@ const Navbar = () => {
         <li><Link to="/contacto">Contacto</Link></li>
         <li><Link to="/servicios">Servicios</Link></li>
         <li><Link to="/reservas">Reservar</Link></li>
+        {usuario?.tipo === "ADMINISTRADOR" && (
         <li><Link to="/Admin">Panel Administrador</Link></li>
+        )}
       </ul>
 
       {/* AVATAR - Menú de perfil */}
