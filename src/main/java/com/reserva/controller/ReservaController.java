@@ -46,63 +46,98 @@ public class ReservaController {
         return reservaService.obtenerPorId(id);
     }
 
-    
-    @PostMapping
-    public ResponseEntity<?> crearReserva(@RequestBody Reserva reserva) {
-        Long servicioId = reserva.getServicio().getId();
-        Optional<Servicio> servicioOpt = servicioService.obtenerPorId(servicioId);
-        if (servicioOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Servicio no encontrado.");
-        }
 
-        Servicio servicio = servicioOpt.get();
-        reserva.setServicio(servicio);
-        LocalDateTime inicio = reserva.getFechaYHora();
-        int duracion = servicio.getDuracion();
+   @PostMapping
+   public ResponseEntity<?> crearReserva(@RequestBody Reserva reserva) {
+       Long servicioId = reserva.getServicio().getId();
+       Optional<Servicio> servicioOpt = servicioService.obtenerPorId(servicioId);
+       if (servicioOpt.isEmpty()) {
+           return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Servicio no encontrado.");
+       }
 
-        // 1. validar cliente
-        if (reserva.getClienteOnline() != null) {
-            Long clienteId = reserva.getClienteOnline().getId();
-            Optional<Usuario> clienteOpt = usuarioService.obtenerPorId(clienteId);
+       Servicio servicio = servicioOpt.get();
+       reserva.setServicio(servicio);
+       LocalDateTime inicio = reserva.getFechaYHora();
+       int duracion = servicio.getDuracion();
 
-            if (clienteOpt.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cliente no encontrado.");
-            }
+       // Validar cliente
+       if (reserva.getClienteOnline() != null) {
+           Long clienteId = reserva.getClienteOnline().getId();
+           Optional<Usuario> clienteOpt = usuarioService.obtenerPorId(clienteId);
+           if (clienteOpt.isEmpty()) {
+               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cliente no encontrado.");
+           }
 
-            Usuario cliente = clienteOpt.get();
-            reserva.setClienteOnline(cliente);
+           Usuario cliente = clienteOpt.get();
+           reserva.setClienteOnline(cliente);
 
-            // 2. Validar si ya tiene reserva en ese horario
-            if (reservaService.clienteTieneReservaEnEseHorario(cliente, inicio, duracion)) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("Ya tienes una reserva en ese horario.");
-            }
-        }
+           // Verificar si el cliente ya tiene otra reserva en ese horario
+           if (reservaService.clienteTieneOtraReservaEnEseHorario(clienteId, inicio, duracion, null)) {
+               return ResponseEntity.status(HttpStatus.CONFLICT).body("Ya tienes una reserva en ese horario.");
+           }
+       }
 
-        // 3. Buscar trabajador disponible  ---
-        List<Trabajador> trabajadores = trabajadorService.obtenerTodos();
-        for (Trabajador t : trabajadores) {
-            boolean ocupado = reservaService.estaTrabajadorOcupadoDurante(t, inicio, duracion);
-            if (!ocupado) {
-                reserva.setTrabajador(t);
-                Reserva nueva = reservaService.guardarReserva(reserva);
-                return ResponseEntity.ok(nueva);
-            }
-        }
+       // Buscar trabajador disponible
+       List<Trabajador> trabajadores = trabajadorService.obtenerTodos();
+       for (Trabajador t : trabajadores) {
+           boolean ocupado = reservaService.estaTrabajadorOcupadoDurante(t, inicio, duracion, null);
+           if (!ocupado) {
+               reserva.setTrabajador(t);
+               Reserva nueva = reservaService.guardarReserva(reserva);
+               return ResponseEntity.ok(nueva);
+           }
+       }
 
-        return ResponseEntity.status(HttpStatus.CONFLICT).body("No hay trabajadores disponibles para esa hora.");
+       return ResponseEntity.status(HttpStatus.CONFLICT).body("No hay trabajadores disponibles para esa hora.");
+   }
 
-    }
+   @PutMapping("/{id}")
+   public ResponseEntity<?> actualizarReserva(@PathVariable Long id, @RequestBody Reserva reserva) {
+       reserva.setId(id);
+
+       Long servicioId = reserva.getServicio().getId();
+       Optional<Servicio> servicioOpt = servicioService.obtenerPorId(servicioId);
+       if (servicioOpt.isEmpty()) {
+           return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Servicio no encontrado.");
+       }
+
+       Servicio servicio = servicioOpt.get();
+       reserva.setServicio(servicio);
+       LocalDateTime inicio = reserva.getFechaYHora();
+       int duracion = servicio.getDuracion();
+
+       if (reserva.getClienteOnline() != null) {
+           Long clienteId = reserva.getClienteOnline().getId();
+           Optional<Usuario> clienteOpt = usuarioService.obtenerPorId(clienteId);
+           if (clienteOpt.isEmpty()) {
+               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cliente no encontrado.");
+           }
+
+           Usuario cliente = clienteOpt.get();
+           reserva.setClienteOnline(cliente);
+
+           // Evita conflicto con sus otras reservas
+           if (reservaService.clienteTieneOtraReservaEnEseHorario(clienteId, inicio, duracion, id)) {
+               return ResponseEntity.status(HttpStatus.CONFLICT).body("Ya tienes una reserva en ese horario.");
+           }
+       }
+
+       // Verifica trabajadores disponibles
+       List<Trabajador> trabajadores = trabajadorService.obtenerTodos();
+       for (Trabajador t : trabajadores) {
+           boolean ocupado = reservaService.estaTrabajadorOcupadoDurante(t, inicio, duracion, id);
+           if (!ocupado) {
+               reserva.setTrabajador(t);
+               Reserva actualizada = reservaService.guardarReserva(reserva);
+               return ResponseEntity.ok(actualizada);
+           }
+       }
+
+       return ResponseEntity.status(HttpStatus.CONFLICT)
+               .body("Lo sentimos, no hay disponibilidad para la franja seleccionada ");
+   }
 
 
-
-
-
-
-    @PutMapping("/{id}")
-    public Reserva actualizarReserva(@PathVariable Long id, @RequestBody Reserva reserva) {
-        reserva.setId(id);
-        return reservaService.guardarReserva(reserva);
-    }
 
     @DeleteMapping("/{id}")
     public void eliminarReserva(@PathVariable Long id) {

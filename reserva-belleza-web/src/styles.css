@@ -737,3 +737,35 @@ button:disabled {
   border-radius: 5px;
   cursor: pointer;
 }
+
+.botones-cita {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column; /* 🔥 Cambia la dirección a columna */
+  gap: 10px;              /* Espacio entre los botones */
+}
+
+.btn-editar, .btn-eliminar {
+  width: 100%;            /* 🔥 Ocupan todo el ancho del contenedor */
+  padding: 10px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+
+.btn-eliminar {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-eliminar:hover {
+  background-color: #c9302c;
+}

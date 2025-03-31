@@ -5,6 +5,7 @@ const ReservaEditarModal = ({ reserva, onClose, onGuardar }) => {
   const [fechaYHora, setFechaYHora] = useState(reserva.fechaYHora);
   const [servicioId, setServicioId] = useState(reserva.servicio.id);
   const [serviciosDisponibles, setServiciosDisponibles] = useState([]);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchServicios = async () => {
@@ -18,8 +19,9 @@ const ReservaEditarModal = ({ reserva, onClose, onGuardar }) => {
     fetchServicios();
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(''); 
     const servicioSeleccionado = serviciosDisponibles.find(s => s.id === servicioId);
 
     const reservaActualizada = {
@@ -32,7 +34,30 @@ const ReservaEditarModal = ({ reserva, onClose, onGuardar }) => {
       }
     };
 
-    onGuardar(reservaActualizada);
+    try {
+      const res = await fetch(`http://localhost:5000/api/reservas/${reservaActualizada.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(reservaActualizada),
+      });
+
+      if (res.status === 409) {
+        const mensaje = await res.text();
+        setError(mensaje);
+        return;
+      }
+
+      if (!res.ok) {
+        throw new Error('Error al guardar los cambios de la reserva');
+      }
+
+      onGuardar(); // solo si fue exitoso
+    } catch (err) {
+      setError(err.message);
+      console.error(err);
+    }
   };
 
   return (
@@ -65,6 +90,8 @@ const ReservaEditarModal = ({ reserva, onClose, onGuardar }) => {
               ))}
             </select>
           </label>
+
+          {error && <p className="error-text" style={{ color: 'red', marginTop: '10px' }}>{error}</p>}
 
           <div className="modal-botones">
             <button type="submit">Guardar cambios</button>
