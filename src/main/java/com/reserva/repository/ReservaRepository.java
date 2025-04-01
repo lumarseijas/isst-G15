@@ -18,6 +18,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     List<Reserva> findByClienteOnlineAndFechaYHoraBetween(Usuario clienteOnline, LocalDateTime desde, LocalDateTime hasta);
     List<Reserva> findByClienteOnlineId(Long clienteId);
     List<Reserva> findByTrabajador(Trabajador trabajador);
+    
 
 
 }

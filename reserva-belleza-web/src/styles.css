@@ -769,3 +769,19 @@ button:disabled {
 .btn-eliminar:hover {
   background-color: #c9302c;
 }
+
+
+.btn-toggle-historial {
+  padding: 8px 16px;
+  border-radius: 20px;
+  background-color: #888;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.btn-toggle-historial:hover {
+  background-color: #555;
+}

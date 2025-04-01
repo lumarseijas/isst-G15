@@ -7,6 +7,7 @@ const Citas = () => {
   const [error, setError] = useState('');
   const [mostrarModal, setMostrarModal] = useState(false);
   const [citaSeleccionada, setCitaSeleccionada] = useState(null);
+  const [mostrarHistorial, setMostrarHistorial] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -52,25 +53,42 @@ const Citas = () => {
     setMostrarModal(false);
     setCitaSeleccionada(null);
   };
-  
+
+  const ahora = new Date();
+  const citasFuturas = citas.filter(cita => new Date(cita.fechaYHora) >= ahora);
+  const citasPasadas = citas.filter(cita => new Date(cita.fechaYHora) < ahora);
+
+  const citasAMostrar = mostrarHistorial ? citasPasadas : citasFuturas;
+
   return (
     <div className="citas-wrapper">
-      <h2 className="titulo-citas">Mis Citas</h2>
+      <h2 className="titulo-citas">{mostrarHistorial ? 'Historial de Citas' : 'Mis Citas Futuras'}</h2>
+      
+      <div style={{ marginBottom: '20px' }}>
+        <button onClick={() => setMostrarHistorial(!mostrarHistorial)} className="btn-toggle-historial">
+          {mostrarHistorial ? 'Ver Citas Futuras' : 'Ver Historial'}
+        </button>
+      </div>
+
       {error && <p className="error-text">{error}</p>}
-      {citas.length === 0 ? (
-        <p className="texto-vacio">No tienes ninguna cita aún.</p>
+      {citasAMostrar.length === 0 ? (
+        <p className="texto-vacio">
+          {mostrarHistorial ? 'No tienes citas pasadas.' : 'No tienes ninguna cita futura.'}
+        </p>
       ) : (
         <div className="tarjetas-citas">
-          {citas.map(cita => (
+          {citasAMostrar.map(cita => (
             <div className="tarjeta-cita" key={cita.id}>
               <h3>{cita.servicio.nombreServicio}</h3>
               <p><strong>Fecha:</strong> {new Date(cita.fechaYHora).toLocaleDateString()}</p>
               <p><strong>Hora:</strong> {new Date(cita.fechaYHora).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
               <p><strong>Profesional:</strong> {cita.trabajador?.nombre || 'Por asignar'}</p>
-              <div className="botones-cita">
-                <button onClick={() => handleEditar(cita.id)} className="btn-editar">Editar</button>
-                <button onClick={() => handleEliminar(cita.id)} className="btn-eliminar">Eliminar</button>
-              </div>
+              {!mostrarHistorial && (
+                <div className="botones-cita">
+                  <button onClick={() => handleEditar(cita.id)} className="btn-editar">Editar</button>
+                  <button onClick={() => handleEliminar(cita.id)} className="btn-eliminar">Eliminar</button>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -80,7 +98,6 @@ const Citas = () => {
         <ReservaEditarModal
           reserva={citaSeleccionada}
           onClose={handleCerrarModal}
-          //
           onGuardar={async (reservaActualizada) => {
             try {
               await fetch(`http://localhost:5000/api/reservas/${reservaActualizada.id}`, {
@@ -90,7 +107,7 @@ const Citas = () => {
                 },
                 body: JSON.stringify(reservaActualizada),
               });
-          
+
               handleCerrarModal();
               cargarCitas(); // Recarga la lista con los datos actualizados
             } catch (error) {
@@ -100,10 +117,8 @@ const Citas = () => {
           }}
         />
       )}
-
-
-
     </div>
   );
 };
+
 export default Citas;

@@ -30,4 +30,9 @@ public class ServicioService {
     public void eliminarServicio(Long id) {
         servicioRepository.deleteById(id);
     }
+
+    public Servicio findById(Long id) {
+        return servicioRepository.findById(id).orElseThrow(() -> new RuntimeException("Servicio no encontrado"));
+    }
+    
 }

@@ -10,6 +10,7 @@ const FormularioReserva = () => {
   });
 
   const [servicios, setServicios] = useState([]);
+  const [horasDisponibles, setHorasDisponibles] = useState([]);
   const [fechaValida, setFechaValida] = useState(true);
   const [errorFecha, setErrorFecha] = useState('');
   const [errorHora, setErrorHora] = useState('');
@@ -23,15 +24,11 @@ const FormularioReserva = () => {
   const esAdmin = usuario?.tipo === "ADMINISTRADOR";
 
   useEffect(() => {
-    // Cargar servicios
     fetch('http://localhost:5000/api/servicios')
       .then(res => res.json())
-      .then(data => {
-        setServicios(data);
-      })
+      .then(data => setServicios(data))
       .catch(err => console.error("Error al obtener servicios:", err));
 
-    // Si NO es admin, autocompletar nombre
     if (usuario && !esAdmin) {
       setDatos(prev => ({
         ...prev,
@@ -40,14 +37,26 @@ const FormularioReserva = () => {
     }
   }, []);
 
+  // Cargar horas disponibles
+  useEffect(() => {
+    const cargarHoras = async () => {
+      if (datos.fecha && datos.servicio_id) {
+        try {
+          const res = await fetch(`http://localhost:5000/api/disponibilidad?fecha=${datos.fecha}&servicioId=${datos.servicio_id}`);
+          const data = await res.json();
+          setHorasDisponibles(data);
+        } catch (error) {
+          console.error("Error al cargar horas disponibles:", error);
+          setHorasDisponibles([]);
+        }
+      }
+    };
+    cargarHoras();
+  }, [datos.fecha, datos.servicio_id]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setMostrarErrores(true);
-
-    if (name === 'hora') {
-      const [h] = value.split(':').map(Number);
-      setErrorHora(h >= 9 && h <= 21 ? '' : "Selecciona una hora entre las 09:00 y 21:00.");
-    }
 
     if (name === 'fecha') {
       const seleccionada = new Date(value);
@@ -55,7 +64,7 @@ const FormularioReserva = () => {
       hoy.setHours(0, 0, 0, 0);
       const mañana = new Date(hoy);
       mañana.setDate(hoy.getDate() + 1);
-      const dia = seleccionada.getDay(); // 0 domingo, 6 sábado
+      const dia = seleccionada.getDay(); // 0 = domingo, 6 = sábado
 
       if (seleccionada < mañana) {
         setFechaValida(false);
@@ -69,7 +78,7 @@ const FormularioReserva = () => {
       }
     }
 
-    setDatos({ ...datos, [name]: value });
+    setDatos(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -194,16 +203,22 @@ const FormularioReserva = () => {
 
         <div className="form-row">
           <label>Hora * {errorHora && <span className="inline-error">{errorHora}</span>}</label>
-          <input
-            type="time"
+          <select
             name="hora"
             value={datos.hora}
             onChange={handleChange}
             required
-            min="09:00"
-            max="21:00"
-            step="300"
-          />
+            className={mostrarErrores && datos.hora === '' ? 'input-error' : ''}
+          >
+            <option value="">Selecciona una hora</option>
+            {horasDisponibles.length === 0 && datos.fecha && datos.servicio_id ? (
+              <option disabled>No hay disponibilidad</option>
+            ) : (
+              horasDisponibles.map(hora => (
+                <option key={hora} value={hora}>{hora}</option>
+              ))
+            )}
+          </select>
         </div>
 
         {!formularioValido && (

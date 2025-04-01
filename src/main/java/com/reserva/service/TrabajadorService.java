@@ -31,4 +31,9 @@ public class TrabajadorService {
     public void eliminarTrabajador(Long id) {
         trabajadorRepository.deleteById(id);
     }
+
+    public List<Trabajador> findAll() {
+        return trabajadorRepository.findAll();
+    }
+    
 }

@@ -6,6 +6,7 @@ import com.reserva.model.Usuario;
 import com.reserva.repository.ReservaRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -43,19 +44,6 @@ public class ReservaService {
     return reservaRepository.existsByTrabajadorAndFechaYHora(trabajador, fechaYHora);
     }
 
-    /*public boolean estaTrabajadorOcupadoDurante(Trabajador trabajador, LocalDateTime inicio, int duracionMinutos) {
-        LocalDateTime fin = inicio.plusMinutes(duracionMinutos);
-        List<Reserva> reservas = reservaRepository.findByTrabajadorAndFechaYHoraBetween(trabajador, inicio.minusMinutes(duracionMinutos), fin);
-    
-        for (Reserva r : reservas) {
-            LocalDateTime inicioExistente = r.getFechaYHora();
-            LocalDateTime finExistente = inicioExistente.plusMinutes(r.getServicio().getDuracion());
-    
-            boolean haySolapamiento = inicio.isBefore(finExistente) && fin.isAfter(inicioExistente);
-            if (haySolapamiento) return true;
-        }
-        return false;
-    }*/
     public boolean estaTrabajadorOcupadoDurante(Trabajador trabajador, LocalDateTime inicio, int duracion, Long reservaActualId) {
         List<Reserva> reservas = reservaRepository.findByTrabajador(trabajador);
     
@@ -90,19 +78,6 @@ public class ReservaService {
     return false;
 }
 
-/*public boolean clienteTieneReservaEnEseHorario(Usuario cliente, LocalDateTime inicio, int duracionMinutos) {
-    LocalDateTime fin = inicio.plusMinutes(duracionMinutos);
-    List<Reserva> reservasCliente = reservaRepository.findByClienteOnlineAndFechaYHoraBetween(cliente, inicio.minusMinutes(duracionMinutos), fin);
-
-    for (Reserva r : reservasCliente) {
-        LocalDateTime inicioExistente = r.getFechaYHora();
-        LocalDateTime finExistente = inicioExistente.plusMinutes(r.getServicio().getDuracion());
-
-        boolean haySolapamiento = inicio.isBefore(finExistente) && fin.isAfter(inicioExistente);
-        if (haySolapamiento) return true;
-    }
-    return false;
-}*/
 public boolean clienteTieneOtraReservaEnEseHorario(Long clienteId, LocalDateTime inicio, int duracion, Long reservaActualId) {
     List<Reserva> reservas = reservaRepository.findByClienteOnlineId(clienteId);
     LocalDateTime fin = inicio.plusMinutes(duracion);
@@ -124,6 +99,11 @@ public List<Reserva> obtenerPorClienteId(Long clienteId) {
     return reservaRepository.findByClienteOnlineId(clienteId);
 }
 
+public List<Reserva> findByFecha(LocalDate fecha) {
+    LocalDateTime inicio = fecha.atTime(9, 0);
+    LocalDateTime fin = fecha.atTime(21, 0);
+    return reservaRepository.findByFechaYHoraBetween(inicio, fin);
+}
 
 
     
