@@ -154,7 +154,7 @@ const FormularioReserva = () => {
           value={datos.nombre_cliente}
           onChange={handleChange}
           required
-          disabled={!esAdmin}
+          disabled={!esAdmin && usuario}
         />
 
         {esAdmin && (

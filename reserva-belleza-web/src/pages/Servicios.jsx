@@ -18,9 +18,9 @@ return (
       {servicios.length > 0 ? (
         servicios.map((servicio) => (
           <div key={servicio.id} className="servicio-card">
-            <img src={servicio.imagen} alt={servicio.nombre_servicio} className="servicio-img" />
+            <img src={servicio.imagen} alt={servicio.nombreServicio} className="servicio-img" />
             <div className="servicio-info">
-              <h3>{servicio.nombre_servicio}</h3>
+              <h3>{servicio.nombreServicio}</h3>
               <p>Duración: {servicio.duracion} min</p>
               <p>Precio: {servicio.precio}€</p>
             </div>
