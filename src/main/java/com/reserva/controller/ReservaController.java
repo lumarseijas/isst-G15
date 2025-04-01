@@ -20,7 +20,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/reservas")
-@CrossOrigin(origins = "*") // Permite acceso desde cualquier dominio
+@CrossOrigin(origins = "*")
 public class ReservaController {
 
     private final TrabajadorService trabajadorService;
@@ -28,13 +28,13 @@ public class ReservaController {
     private final ServicioService servicioService;
     private final UsuarioService usuarioService;
 
-    public ReservaController(ReservaService reservaService, TrabajadorService trabajadorService, ServicioService servicioService, UsuarioService usuarioService) {
+    public ReservaController(ReservaService reservaService, TrabajadorService trabajadorService,
+                             ServicioService servicioService, UsuarioService usuarioService) {
         this.reservaService = reservaService;
         this.trabajadorService = trabajadorService;
         this.servicioService = servicioService;
         this.usuarioService = usuarioService;
     }
-    
 
     @GetMapping
     public List<Reserva> obtenerTodas() {
@@ -46,98 +46,97 @@ public class ReservaController {
         return reservaService.obtenerPorId(id);
     }
 
+    @PostMapping
+    public ResponseEntity<?> crearReserva(@RequestBody Reserva reserva) {
+        Long servicioId = reserva.getServicio().getId();
+        Optional<Servicio> servicioOpt = servicioService.obtenerPorId(servicioId);
+        if (servicioOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Servicio no encontrado.");
+        }
 
-   @PostMapping
-   public ResponseEntity<?> crearReserva(@RequestBody Reserva reserva) {
-       Long servicioId = reserva.getServicio().getId();
-       Optional<Servicio> servicioOpt = servicioService.obtenerPorId(servicioId);
-       if (servicioOpt.isEmpty()) {
-           return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Servicio no encontrado.");
-       }
+        Servicio servicio = servicioOpt.get();
+        reserva.setServicio(servicio);
+        LocalDateTime inicio = reserva.getFechaYHora();
+        int duracion = servicio.getDuracion();
 
-       Servicio servicio = servicioOpt.get();
-       reserva.setServicio(servicio);
-       LocalDateTime inicio = reserva.getFechaYHora();
-       int duracion = servicio.getDuracion();
+        // Validar cliente
+        if (reserva.getClienteOnline() != null) {
+            Long clienteId = reserva.getClienteOnline().getId();
+            Optional<Usuario> clienteOpt = usuarioService.obtenerPorId(clienteId);
+            if (clienteOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cliente no encontrado.");
+            }
 
-       // Validar cliente
-       if (reserva.getClienteOnline() != null) {
-           Long clienteId = reserva.getClienteOnline().getId();
-           Optional<Usuario> clienteOpt = usuarioService.obtenerPorId(clienteId);
-           if (clienteOpt.isEmpty()) {
-               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cliente no encontrado.");
-           }
+            Usuario cliente = clienteOpt.get();
+            reserva.setClienteOnline(cliente);
 
-           Usuario cliente = clienteOpt.get();
-           reserva.setClienteOnline(cliente);
+            if (reservaService.clienteTieneOtraReservaEnEseHorario(clienteId, inicio, duracion, null)) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Ya tienes una reserva en ese horario.");
+            }
+        }
 
-           // Verificar si el cliente ya tiene otra reserva en ese horario
-           if (reservaService.clienteTieneOtraReservaEnEseHorario(clienteId, inicio, duracion, null)) {
-               return ResponseEntity.status(HttpStatus.CONFLICT).body("Ya tienes una reserva en ese horario.");
-           }
-       }
+        // Buscar trabajadores disponibles
+        List<Trabajador> disponibles = trabajadorService.obtenerTodos().stream()
+                .filter(t -> !reservaService.estaTrabajadorOcupadoDurante(t, inicio, duracion, null))
+                .toList();
 
-       // Buscar trabajador disponible
-       List<Trabajador> trabajadores = trabajadorService.obtenerTodos();
-       for (Trabajador t : trabajadores) {
-           boolean ocupado = reservaService.estaTrabajadorOcupadoDurante(t, inicio, duracion, null);
-           if (!ocupado) {
-               reserva.setTrabajador(t);
-               Reserva nueva = reservaService.guardarReserva(reserva);
-               return ResponseEntity.ok(nueva);
-           }
-       }
+        if (disponibles.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("No hay trabajadores disponibles para esa hora.");
+        }
 
-       return ResponseEntity.status(HttpStatus.CONFLICT).body("No hay trabajadores disponibles para esa hora.");
-   }
+        Trabajador asignado = disponibles.get((int) (Math.random() * disponibles.size()));
+        reserva.setTrabajador(asignado);
 
-   @PutMapping("/{id}")
-   public ResponseEntity<?> actualizarReserva(@PathVariable Long id, @RequestBody Reserva reserva) {
-       reserva.setId(id);
+        Reserva nueva = reservaService.guardarReserva(reserva);
+        return ResponseEntity.ok(nueva);
+    }
 
-       Long servicioId = reserva.getServicio().getId();
-       Optional<Servicio> servicioOpt = servicioService.obtenerPorId(servicioId);
-       if (servicioOpt.isEmpty()) {
-           return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Servicio no encontrado.");
-       }
+    @PutMapping("/{id}")
+    public ResponseEntity<?> actualizarReserva(@PathVariable Long id, @RequestBody Reserva reserva) {
+        reserva.setId(id);
 
-       Servicio servicio = servicioOpt.get();
-       reserva.setServicio(servicio);
-       LocalDateTime inicio = reserva.getFechaYHora();
-       int duracion = servicio.getDuracion();
+        Long servicioId = reserva.getServicio().getId();
+        Optional<Servicio> servicioOpt = servicioService.obtenerPorId(servicioId);
+        if (servicioOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Servicio no encontrado.");
+        }
 
-       if (reserva.getClienteOnline() != null) {
-           Long clienteId = reserva.getClienteOnline().getId();
-           Optional<Usuario> clienteOpt = usuarioService.obtenerPorId(clienteId);
-           if (clienteOpt.isEmpty()) {
-               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cliente no encontrado.");
-           }
+        Servicio servicio = servicioOpt.get();
+        reserva.setServicio(servicio);
+        LocalDateTime inicio = reserva.getFechaYHora();
+        int duracion = servicio.getDuracion();
 
-           Usuario cliente = clienteOpt.get();
-           reserva.setClienteOnline(cliente);
+        if (reserva.getClienteOnline() != null) {
+            Long clienteId = reserva.getClienteOnline().getId();
+            Optional<Usuario> clienteOpt = usuarioService.obtenerPorId(clienteId);
+            if (clienteOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cliente no encontrado.");
+            }
 
-           // Evita conflicto con sus otras reservas
-           if (reservaService.clienteTieneOtraReservaEnEseHorario(clienteId, inicio, duracion, id)) {
-               return ResponseEntity.status(HttpStatus.CONFLICT).body("Ya tienes una reserva en ese horario.");
-           }
-       }
+            Usuario cliente = clienteOpt.get();
+            reserva.setClienteOnline(cliente);
 
-       // Verifica trabajadores disponibles
-       List<Trabajador> trabajadores = trabajadorService.obtenerTodos();
-       for (Trabajador t : trabajadores) {
-           boolean ocupado = reservaService.estaTrabajadorOcupadoDurante(t, inicio, duracion, id);
-           if (!ocupado) {
-               reserva.setTrabajador(t);
-               Reserva actualizada = reservaService.guardarReserva(reserva);
-               return ResponseEntity.ok(actualizada);
-           }
-       }
+            if (reservaService.clienteTieneOtraReservaEnEseHorario(clienteId, inicio, duracion, id)) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Ya tienes una reserva en ese horario.");
+            }
+        }
 
-       return ResponseEntity.status(HttpStatus.CONFLICT)
-               .body("Lo sentimos, no hay disponibilidad para la franja seleccionada ");
-   }
+        // Buscar trabajadores disponibles (excluyendo el actual en edición)
+        List<Trabajador> disponibles = trabajadorService.obtenerTodos().stream()
+                .filter(t -> !reservaService.estaTrabajadorOcupadoDurante(t, inicio, duracion, id))
+                .toList();
 
+        if (disponibles.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Lo sentimos, no hay disponibilidad para la franja seleccionada ");
+        }
 
+        Trabajador asignado = disponibles.get((int) (Math.random() * disponibles.size()));
+        reserva.setTrabajador(asignado);
+
+        Reserva actualizada = reservaService.guardarReserva(reserva);
+        return ResponseEntity.ok(actualizada);
+    }
 
     @DeleteMapping("/{id}")
     public void eliminarReserva(@PathVariable Long id) {
@@ -156,16 +155,10 @@ public class ReservaController {
         return reservaService.obtenerPorClienteId(clienteId);
     }
 
-
     @GetMapping("/semana")
-    public List<Reserva> obtenerReservasSemana(
-        @RequestParam String inicio,
-        @RequestParam String fin) {
-    
+    public List<Reserva> obtenerReservasSemana(@RequestParam String inicio, @RequestParam String fin) {
         LocalDateTime startDate = LocalDate.parse(inicio).atStartOfDay();
         LocalDateTime endDate = LocalDate.parse(fin).atTime(23, 59);
-
         return reservaService.obtenerReservasPorFecha(startDate, endDate);
     }
-    
 }
