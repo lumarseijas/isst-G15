@@ -55,9 +55,14 @@ const Citas = () => {
   };
 
   const ahora = new Date();
+  const puedeModificar = (fechaYHora) => {
+    const fechaCita = new Date(fechaYHora);
+    const diffHoras = (fechaCita - ahora) / (1000 * 60 * 60);
+    return diffHoras >= 24;
+  };
+
   const citasFuturas = citas.filter(cita => new Date(cita.fechaYHora) >= ahora);
   const citasPasadas = citas.filter(cita => new Date(cita.fechaYHora) < ahora);
-
   const citasAMostrar = mostrarHistorial ? citasPasadas : citasFuturas;
 
   return (
@@ -77,20 +82,28 @@ const Citas = () => {
         </p>
       ) : (
         <div className="tarjetas-citas">
-          {citasAMostrar.map(cita => (
-            <div className="tarjeta-cita" key={cita.id}>
-              <h3>{cita.servicio.nombreServicio}</h3>
-              <p><strong>Fecha:</strong> {new Date(cita.fechaYHora).toLocaleDateString()}</p>
-              <p><strong>Hora:</strong> {new Date(cita.fechaYHora).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-              <p><strong>Profesional:</strong> {cita.trabajador?.nombre || 'Por asignar'}</p>
-              {!mostrarHistorial && (
-                <div className="botones-cita">
-                  <button onClick={() => handleEditar(cita.id)} className="btn-editar">Editar</button>
-                  <button onClick={() => handleEliminar(cita.id)} className="btn-eliminar">Eliminar</button>
-                </div>
-              )}
-            </div>
-          ))}
+          {citasAMostrar.map(cita => {
+            const modificable = puedeModificar(cita.fechaYHora);
+            return (
+              <div className="tarjeta-cita" key={cita.id}>
+                <h3>{cita.servicio.nombreServicio}</h3>
+                <p><strong>Fecha:</strong> {new Date(cita.fechaYHora).toLocaleDateString()}</p>
+                <p><strong>Hora:</strong> {new Date(cita.fechaYHora).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                <p><strong>Profesional:</strong> {cita.trabajador?.nombre || 'Por asignar'}</p>
+                
+                {!mostrarHistorial && (
+                  modificable ? (
+                    <div className="botones-cita">
+                      <button onClick={() => handleEditar(cita.id)} className="btn-editar">Editar</button>
+                      <button onClick={() => handleEliminar(cita.id)} className="btn-eliminar">Eliminar</button>
+                    </div>
+                  ) : (
+                    <p className="texto-no-editable">No editable ni cancelable (menos de 24h)</p>
+                  )
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
 
@@ -109,7 +122,7 @@ const Citas = () => {
               });
 
               handleCerrarModal();
-              cargarCitas(); // Recarga la lista con los datos actualizados
+              cargarCitas();
             } catch (error) {
               alert('Error al guardar los cambios de la reserva');
               console.error(error);
