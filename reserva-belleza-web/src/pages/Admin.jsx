@@ -18,6 +18,7 @@ const getSemanaConOffset = (offsetSemanas) => {
 
 const Admin = () => {
   const [trabajadores, setTrabajadores] = useState([]);
+  const [mediaPorTrabajador, setMediaPorTrabajador] = useState({});
   const [trabajadoresVisibles, setTrabajadoresVisibles] = useState([]);
   const [servicios, setServicios] = useState([]);
   const [serviciosVisibles, setServiciosVisibles] = useState([]);
@@ -25,7 +26,6 @@ const Admin = () => {
   const [semanaOffset, setSemanaOffset] = useState(0);
   const [semana, setSemana] = useState(getSemanaConOffset(0));
   const navigate = useNavigate();
-
 
   const fetchReservas = async () => {
     try {
@@ -45,6 +45,21 @@ const Admin = () => {
         const trabajadoresRes = await axios.get("http://localhost:5000/api/trabajadores");
         setTrabajadores(trabajadoresRes.data);
         setTrabajadoresVisibles(trabajadoresRes.data.map((t) => t.id));
+
+        // Cargar medias por trabajador
+        trabajadoresRes.data.forEach(async (trabajador) => {
+          try {
+            const res = await axios.get(`http://localhost:5000/api/valoraciones/media/trabajador/${trabajador.id}`);
+            if (res.data !== null) {
+              setMediaPorTrabajador(prev => ({
+                ...prev,
+                [trabajador.id]: parseFloat(res.data).toFixed(1)
+              }));
+            }
+          } catch (err) {
+            console.error("Error al obtener media del trabajador", trabajador.id, err);
+          }
+        });
 
         const colores = ["#00BFFF", "#FF6347", "#32CD32", "#FF69B4", "#8A2BE2", "#FFA500", "#9370DB"];
         const serviciosRes = await axios.get("http://localhost:5000/api/servicios");
@@ -145,44 +160,49 @@ const Admin = () => {
                   alignItems: "center",
                   gap: "0.5rem",
                   whiteSpace: "nowrap",
+                  flexDirection: "column",
+                  alignItems: "flex-start"
                 }}
               >
-                <input
-                  type="checkbox"
-                  checked={trabajadoresVisibles.includes(t.id)}
-                  onChange={() => toggleTrabajador(t.id)}
-                />
-                <span>
-                  {t.nombre} ({contarReservasTrabajador(t.id)})
-                </span>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <input
+                    type="checkbox"
+                    checked={trabajadoresVisibles.includes(t.id)}
+                    onChange={() => toggleTrabajador(t.id)}
+                  />
+                  <span>{t.nombre} ({contarReservasTrabajador(t.id)})</span>
+                </div>
+                {mediaPorTrabajador[t.id] && (
+                  <span style={{ color: "#ffc107", fontWeight: "bold", fontSize: "0.9rem", marginLeft: "1.5rem" }}>
+                    ⭐ {mediaPorTrabajador[t.id]} / 5
+                  </span>
+                )}
               </label>
             </li>
           ))}
         </ul>
 
         <div style={{ marginTop: "1rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-        <button
-  onClick={() => navigate("/reservas")}
-  style={{
-    backgroundColor: "#b48ec6",
-    color: "white",
-    padding: "10px 15px",
-    border: "none",
-    borderRadius: "20px",
-    fontSize: "1rem",
-    fontWeight: "bold",
-    cursor: "pointer"
-  }}
->
-  ➕ Añadir cita
-</button>
+          <button
+            onClick={() => navigate("/reservas")}
+            style={{
+              backgroundColor: "#b48ec6",
+              color: "white",
+              padding: "10px 15px",
+              border: "none",
+              borderRadius: "20px",
+              fontSize: "1rem",
+              fontWeight: "bold",
+              cursor: "pointer"
+            }}
+          >
+            ➕ Añadir cita
+          </button>
 
-
-  <button onClick={() => cambiarSemana(-1)}>← Semana anterior</button>
-  <button onClick={volverASemanaActual}>Semana actual</button>
-  <button onClick={() => cambiarSemana(1)}>Semana siguiente →</button>
-</div>
-
+          <button onClick={() => cambiarSemana(-1)}>← Semana anterior</button>
+          <button onClick={volverASemanaActual}>Semana actual</button>
+          <button onClick={() => cambiarSemana(1)}>Semana siguiente →</button>
+        </div>
       </div>
 
       <div className="calendar-container">

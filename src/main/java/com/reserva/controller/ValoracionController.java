@@ -63,6 +63,12 @@ public class ValoracionController {
     public List<Valoracion> obtenerPorServicio(@PathVariable Long servicioId) {
         return valoracionService.obtenerValoracionesPorServicio(servicioId);
     }
+    // Obtener valoraciones por trabajador (para mostrar nota media)
+    @GetMapping("/media/trabajador/{trabajadorId}")
+    public Double obtenerMediaPorTrabajador(@PathVariable Long trabajadorId) {
+        return valoracionService.obtenerMediaValoracionPorTrabajador(trabajadorId);
+    }
+
 
     // Eliminar una valoración (opcional)
     @DeleteMapping("/{id}")

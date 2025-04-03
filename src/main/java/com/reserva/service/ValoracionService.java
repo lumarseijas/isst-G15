@@ -35,4 +35,14 @@ public class ValoracionService {
     public void eliminarValoracion(Long id) {
         valoracionRepository.deleteById(id);
     }
+
+    public Double obtenerMediaValoracionPorTrabajador(Long trabajadorId) {
+        List<Valoracion> valoraciones = valoracionRepository.findByTrabajadorId(trabajadorId);
+        if (valoraciones.isEmpty()) return null;
+        return valoraciones.stream()
+                .mapToInt(Valoracion::getEstrellas)
+                .average()
+                .orElse(0.0);
+    }
+    
 }
