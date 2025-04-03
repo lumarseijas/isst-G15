@@ -41,7 +41,7 @@ const Contacto = () => {
 
         {/* SECCIÓN DERECHA: Dirección y Mapa */}
         <div className="mapa-container">
-          <p className="direccion">📍 Calle Belleza, 123, Ciudad</p>
+          <p className="direccion">📍 Calle Mirador de la Reina, 12</p>
           <iframe 
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7812.391308016873!2d-3.730860967038291!3d40.48892268662849!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd4229d93b6f7507%3A0xbb8ebf0aab4a1624!2sMiia%20Belleza%20Saludable!5e0!3m2!1ses!2ses!4v1742131646225!5m2!1ses!2ses" 
             allowFullScreen

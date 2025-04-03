@@ -63,13 +63,13 @@ const Registro = () => {
         <label>Nombre</label>
         <input type="text" name="nombre" value={datos.nombre} onChange={handleChange} required />
 
-        <label>Email</label>
+        <label>Email *</label>
         <input type="email" name="email" value={datos.email} onChange={handleChange} required />
 
         <label>Teléfono (opcional)</label>
         <input type="tel" name="telefono" value={datos.telefono} onChange={handleChange} />
 
-        <label>Contraseña</label>
+        <label>Contraseña *</label>
         <input type="password" name="password" value={datos.password} onChange={handleChange} required />
 
         <label>Selecciona tu avatar</label>

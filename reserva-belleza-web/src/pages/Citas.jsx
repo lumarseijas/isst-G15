@@ -8,12 +8,14 @@ const Citas = () => {
   const [mostrarModal, setMostrarModal] = useState(false);
   const [citaSeleccionada, setCitaSeleccionada] = useState(null);
   const [mostrarHistorial, setMostrarHistorial] = useState(false);
+  const [valoraciones, setValoraciones] = useState({});
+  const [nuevaValoracion, setNuevaValoracion] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
     cargarCitas();
   }, []);
-  
+
   const cargarCitas = () => {
     const usuario = JSON.parse(localStorage.getItem('usuario'));
     if (!usuario) {
@@ -26,7 +28,20 @@ const Citas = () => {
         if (!res.ok) throw new Error('Error al cargar tus citas.');
         return res.json();
       })
-      .then(data => setCitas(data))
+      .then(data => {
+        setCitas(data);
+        data.forEach(cita => {
+          if (new Date(cita.fechaYHora) < new Date()) {
+            fetch(`http://localhost:5000/api/valoraciones/reserva/${cita.id}`)
+              .then(v => v.json())
+              .then(val => {
+                if (val?.id) {
+                  setValoraciones(prev => ({ ...prev, [cita.id]: val }));
+                }
+              });
+          }
+        });
+      })
       .catch(err => setError(err.message));
   };
 
@@ -61,6 +76,26 @@ const Citas = () => {
     return diffHoras >= 24;
   };
 
+  const enviarValoracion = (cita) => {
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    const datos = nuevaValoracion[cita.id];
+    fetch('http://localhost:5000/api/valoraciones', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        reserva: { id: cita.id },
+        usuario: { id: usuario.id },
+        servicio: { id: cita.servicio.id },
+        estrellas: datos.estrellas,
+        comentario: datos.comentario
+      })
+    })
+      .then(res => res.json())
+      .then(val => {
+        setValoraciones(prev => ({ ...prev, [cita.id]: val }));
+      });
+  };
+
   const citasFuturas = citas.filter(cita => new Date(cita.fechaYHora) >= ahora);
   const citasPasadas = citas.filter(cita => new Date(cita.fechaYHora) < ahora);
   const citasAMostrar = mostrarHistorial ? citasPasadas : citasFuturas;
@@ -68,8 +103,13 @@ const Citas = () => {
   return (
     <div className="citas-wrapper">
       <h2 className="titulo-citas">{mostrarHistorial ? 'Historial de Citas' : 'Mis Citas Futuras'}</h2>
-      
-      <div style={{ marginBottom: '20px' }}>
+
+      <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+        {!mostrarHistorial && (
+          <p className="mensaje-recordatorio" style={{ color: '#555', marginBottom: '8px' }}>
+            ¡Recuerda dejar tu valoración en el historial de citas! 😊
+          </p>
+        )}
         <button onClick={() => setMostrarHistorial(!mostrarHistorial)} className="btn-toggle-historial">
           {mostrarHistorial ? 'Ver Citas Futuras' : 'Ver Historial'}
         </button>
@@ -90,7 +130,7 @@ const Citas = () => {
                 <p><strong>Fecha:</strong> {new Date(cita.fechaYHora).toLocaleDateString()}</p>
                 <p><strong>Hora:</strong> {new Date(cita.fechaYHora).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                 <p><strong>Profesional:</strong> {cita.trabajador?.nombre || 'Por asignar'}</p>
-                
+
                 {!mostrarHistorial && (
                   modificable ? (
                     <div className="botones-cita">
@@ -99,6 +139,69 @@ const Citas = () => {
                     </div>
                   ) : (
                     <p className="texto-no-editable">No editable ni cancelable (menos de 24h)</p>
+                  )
+                )}
+
+                {mostrarHistorial && (
+                  valoraciones[cita.id] ? (
+                    <div className="valoracion-hecha">
+                      <div style={{ display: 'flex', gap: '3px' }}>
+                        {[1, 2, 3, 4, 5].map(n => (
+                          <span
+                            key={n}
+                            style={{
+                              fontSize: '20px',
+                              color: valoraciones[cita.id].estrellas >= n ? '#ffc107' : '#ccc'
+                            }}
+                          >
+                            ★
+                          </span>
+                        ))}
+                      </div>
+                      {valoraciones[cita.id].comentario && (
+                        <p><strong>Comentario:</strong> {valoraciones[cita.id].comentario}</p>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="nueva-valoracion">
+                      <div style={{ display: 'flex', gap: '5px', margin: '10px 0' }}>
+                        {[1, 2, 3, 4, 5].map(n => (
+                          <span
+                            key={n}
+                            onClick={() =>
+                              setNuevaValoracion(prev => ({
+                                ...prev,
+                                [cita.id]: {
+                                  ...prev[cita.id],
+                                  estrellas: n
+                                }
+                              }))
+                            }
+                            style={{
+                              cursor: 'pointer',
+                              fontSize: '24px',
+                              color: (nuevaValoracion[cita.id]?.estrellas || 0) >= n ? '#ffc107' : '#ccc'
+                            }}
+                          >
+                            ★
+                          </span>
+                        ))}
+                      </div>
+                      <textarea
+                        placeholder="Escribe tu comentario"
+                        value={nuevaValoracion[cita.id]?.comentario || ''}
+                        onChange={e =>
+                          setNuevaValoracion(prev => ({
+                            ...prev,
+                            [cita.id]: {
+                              ...prev[cita.id],
+                              comentario: e.target.value
+                            }
+                          }))
+                        }
+                      />
+                      <button onClick={() => enviarValoracion(cita)}>Enviar valoración</button>
+                    </div>
                   )
                 )}
               </div>
