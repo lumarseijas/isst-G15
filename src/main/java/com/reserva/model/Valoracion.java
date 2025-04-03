@@ -28,6 +28,8 @@ public class Valoracion {
     private String comentario;
 
     private LocalDateTime fecha;
+    
+    private String respuestaAdmin;
 
     // Getters y Setters
 
@@ -86,4 +88,13 @@ public class Valoracion {
     public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
     }
+
+    public String getRespuestaAdmin() {
+        return respuestaAdmin;
+    }
+    
+    public void setRespuestaAdmin(String respuestaAdmin) {
+        this.respuestaAdmin = respuestaAdmin;
+    }
+    
 }

@@ -159,8 +159,14 @@ const Citas = () => {
                         ))}
                       </div>
                       {valoraciones[cita.id].comentario && (
-                        <p><strong>Comentario:</strong> {valoraciones[cita.id].comentario}</p>
+                        <p><strong>📝 Comentario:</strong> {valoraciones[cita.id].comentario}</p>
                       )}
+                      {valoraciones[cita.id].respuestaAdmin && (
+                        <p style={{ marginTop: '6px', color: '#444' }}>
+                          <strong> Respuesta del centro:</strong> {valoraciones[cita.id].respuestaAdmin}
+                        </p>
+                      )}
+
                     </div>
                   ) : (
                     <div className="nueva-valoracion">

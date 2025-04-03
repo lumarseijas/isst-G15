@@ -5,6 +5,7 @@ import com.reserva.model.Usuario;
 import com.reserva.model.Valoracion;
 import com.reserva.repository.ReservaRepository;
 import com.reserva.repository.UsuarioRepository;
+import com.reserva.repository.ValoracionRepository;
 import com.reserva.service.ValoracionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -27,11 +28,20 @@ public class ValoracionController {
     @Autowired
     private ReservaRepository reservaRepository;
 
+    @Autowired
+    private ValoracionRepository valoracionRepository;
+
     // Guardar una nueva valoración
     @PostMapping
     public Valoracion crearValoracion(@RequestBody Valoracion valoracion) {
         valoracion.setFecha(LocalDateTime.now());
         return valoracionService.guardarValoracion(valoracion);
+    }
+    @PutMapping("/{id}")
+    public Valoracion actualizarValoracion(@PathVariable Long id, @RequestBody Valoracion valoracion) {
+        Valoracion existente = valoracionRepository.findById(id).orElseThrow();
+        existente.setRespuestaAdmin(valoracion.getRespuestaAdmin());
+        return valoracionRepository.save(existente);
     }
 
     // Obtener valoraciones de un usuario
@@ -59,4 +69,5 @@ public class ValoracionController {
     public void eliminar(@PathVariable Long id) {
         valoracionService.eliminarValoracion(id);
     }
+
 }
