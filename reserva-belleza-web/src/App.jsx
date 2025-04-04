@@ -12,6 +12,7 @@ import Registro from './pages/Registro';
 import Perfil from './pages/Perfil';
 import { useState, useEffect } from 'react';
 import Citas from './pages/Citas';
+import NuevoTrabajador from './pages/NuevoTrabajador';
 
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
         <Route path="/perfil" element={<Perfil />} />
         <Route path="/auth" element={<AuthMenu />} />
         <Route path="/citas" element={<Citas />} />
+        <Route path="/trabajadores/nuevo" element={<NuevoTrabajador />} />
       </Routes>
       <Footer />
     </>

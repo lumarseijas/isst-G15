@@ -149,8 +149,31 @@ const Admin = () => {
             </li>
           ))}
         </ul>
-
-        <h3 style={{ marginTop: "1rem" }}>Trabajadores</h3>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "1rem" }}>
+          <h3 style={{ margin: 0  }}>Trabajadores</h3>
+          <button
+            onClick={() => navigate("/trabajadores/nuevo")}
+            style={{
+              marginLeft: "0.2rem", // empuja el botón a la derecha
+              marginRight: "0.2rem", // puedes ajustar este valor a tu gusto
+              backgroundColor: "transparent",
+              color: "#5a2e7d",
+              border: "none",
+              borderRadius: "50%",
+              width: "25px",
+              height: "25px",
+              fontSize: "16px",
+              fontWeight: "bold",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+            title="Añadir trabajador"
+          >
+            +
+          </button>
+        </div>
         <ul style={{ padding: 0, margin: 0 }}>
           {trabajadores.map((t) => (
             <li key={t.id}>
