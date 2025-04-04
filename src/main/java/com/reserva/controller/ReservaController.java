@@ -9,6 +9,7 @@ import com.reserva.service.ServicioService;
 import com.reserva.service.TrabajadorService;
 import com.reserva.service.UsuarioService;
 import com.reserva.repository.ReservaRepository;
+import com.reserva.service.DiaNoDisponibleService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,14 +30,17 @@ public class ReservaController {
     private final ServicioService servicioService;
     private final UsuarioService usuarioService;
     private final ReservaRepository reservaRepository;
+    private final DiaNoDisponibleService diaNoDisponibleService;
 
     public ReservaController(ReservaService reservaService, TrabajadorService trabajadorService,
-                             ServicioService servicioService, UsuarioService usuarioService, ReservaRepository reservaRepository) {
+                             ServicioService servicioService, UsuarioService usuarioService,
+                             ReservaRepository reservaRepository, DiaNoDisponibleService diaNoDisponibleService) {
         this.reservaService = reservaService;
         this.trabajadorService = trabajadorService;
         this.servicioService = servicioService;
         this.usuarioService = usuarioService;
         this.reservaRepository = reservaRepository;
+        this.diaNoDisponibleService = diaNoDisponibleService;
     }
 
     @GetMapping
@@ -62,7 +66,6 @@ public class ReservaController {
         LocalDateTime inicio = reserva.getFechaYHora();
         int duracion = servicio.getDuracion();
 
-        // Validar cliente
         if (reserva.getClienteOnline() != null) {
             Long clienteId = reserva.getClienteOnline().getId();
             Optional<Usuario> clienteOpt = usuarioService.obtenerPorId(clienteId);
@@ -78,9 +81,9 @@ public class ReservaController {
             }
         }
 
-        // Buscar trabajadores disponibles
         List<Trabajador> disponibles = trabajadorService.obtenerTodos().stream()
                 .filter(t -> !reservaService.estaTrabajadorOcupadoDurante(t, inicio, duracion, null))
+                .filter(t -> !diaNoDisponibleService.existeDiaLibre(t.getId(), inicio.toLocalDate()))
                 .toList();
 
         if (disponibles.isEmpty()) {
@@ -124,9 +127,9 @@ public class ReservaController {
             }
         }
 
-        // Buscar trabajadores disponibles (excluyendo el actual en edición)
         List<Trabajador> disponibles = trabajadorService.obtenerTodos().stream()
                 .filter(t -> !reservaService.estaTrabajadorOcupadoDurante(t, inicio, duracion, id))
+                .filter(t -> !diaNoDisponibleService.existeDiaLibre(t.getId(), inicio.toLocalDate()))
                 .toList();
 
         if (disponibles.isEmpty()) {
@@ -170,5 +173,4 @@ public class ReservaController {
         List<Reserva> reservas = reservaRepository.findByTrabajadorId(trabajadorId);
         return ResponseEntity.ok(reservas);
     }
-
 }

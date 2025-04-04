@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import ReservaEditarModal from "../pages/ReservaEditarModal";
 import ReservaDetalleModal from "../pages/ReservaDetalleModal";
@@ -8,9 +8,42 @@ const intervalos = generarIntervalos();
 
 const AdminCalendar = ({ trabajadores, reservas, servicios, semana, recargarReservas }) => {
   const diasConFecha = getDiasSemanaConFecha(semana.inicio);
-
   const [reservaSeleccionada, setReservaSeleccionada] = useState(null);
   const [modoEdicion, setModoEdicion] = useState(false);
+  const [diasNoDisponibles, setDiasNoDisponibles] = useState([]);
+
+  useEffect(() => {
+    const cargarDiasLibres = async () => {
+      try {
+        const respuestas = await Promise.all(
+          trabajadores.map((t) =>
+            axios.get(`http://localhost:5000/api/dias-no-disponibles/${t.id}`)
+          )
+        );
+
+        const todos = respuestas.flatMap((res, i) =>
+          res.data.map((d) => ({
+            trabajadorId: trabajadores[i].id,
+            fecha: d.fecha,
+          }))
+        );
+
+        setDiasNoDisponibles(todos);
+      } catch (error) {
+        console.error("Error al cargar días no disponibles", error);
+      }
+    };
+
+    if (trabajadores.length > 0) {
+      cargarDiasLibres();
+    }
+  }, [trabajadores]);
+
+  const tieneDiaLibre = (trabajadorId, fechaISO) => {
+    return diasNoDisponibles.some(
+      (d) => d.trabajadorId === trabajadorId && d.fecha === fechaISO
+    );
+  };
 
   const handleClickReserva = (reserva) => {
     setReservaSeleccionada(reserva);
@@ -125,6 +158,27 @@ const AdminCalendar = ({ trabajadores, reservas, servicios, semana, recargarRese
                         </div>
                       </td>
                     );
+                  }
+
+                  if (tieneDiaLibre(trabajador.id, dia.fechaISO)) {
+                    if (idx === 0) {
+                      return (
+                        <td
+                          key={`${dia.fechaISO}-${trabajador.id}-${intervalo}`}
+                          rowSpan={intervalos.length}
+                          style={{
+                            backgroundColor: "#e0e0e0",
+                            color: "#555",
+                            textAlign: "center",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          
+                        </td>
+                      );
+                    } else {
+                      return null;
+                    }
                   }
 
                   return (

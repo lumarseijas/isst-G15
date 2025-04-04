@@ -6,6 +6,7 @@ import com.reserva.model.Trabajador;
 import com.reserva.service.ReservaService;
 import com.reserva.service.ServicioService;
 import com.reserva.service.TrabajadorService;
+import com.reserva.service.DiaNoDisponibleService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
 
 @RestController
 @RequestMapping("/api")
@@ -32,6 +32,9 @@ public class DisponibilidadController {
     @Autowired
     private TrabajadorService trabajadorService;
 
+    @Autowired
+    private DiaNoDisponibleService diaNoDisponibleService;
+
     @GetMapping("/disponibilidad")
     public ResponseEntity<List<String>> obtenerHorasDisponibles(
             @RequestParam String fecha,
@@ -43,12 +46,18 @@ public class DisponibilidadController {
 
         List<String> horas = generarIntervalosDe15Minutos();
 
-        List<Trabajador> trabajadores = trabajadorService.findAll();
+        // Obtener trabajadores activos (sin día libre ese día)
+        List<Trabajador> trabajadores = trabajadorService.findAll().stream()
+                .filter(t -> !diaNoDisponibleService.existeDiaLibre(t.getId(), fechaSeleccionada))
+                .collect(Collectors.toList());
+
+        // Obtener reservas del día
         List<Reserva> reservasDelDia = reservaService.findByFecha(fechaSeleccionada);
 
+        // Calcular las horas disponibles donde al menos un trabajador esté libre
         List<String> horasDisponibles = horas.stream()
-            .filter(hora -> hayAlgunTrabajadorDisponible(fechaSeleccionada, hora, duracionMin, trabajadores, reservasDelDia))
-            .collect(Collectors.toList());
+                .filter(hora -> hayAlgunTrabajadorDisponible(fechaSeleccionada, hora, duracionMin, trabajadores, reservasDelDia))
+                .collect(Collectors.toList());
 
         return ResponseEntity.ok(horasDisponibles);
     }
@@ -71,12 +80,13 @@ public class DisponibilidadController {
         LocalTime horaFin = horaInicio.plusMinutes(duracionMin);
 
         for (Trabajador t : trabajadores) {
-            boolean ocupado = reservas.stream().anyMatch(r -> 
+            boolean ocupado = reservas.stream().anyMatch(r ->
                 r.getTrabajador().getId().equals(t.getId()) &&
-                solapa(horaInicio, horaFin, r.getFechaYHora().toLocalTime(), 
-                                          r.getFechaYHora().toLocalTime().plusMinutes(r.getServicio().getDuracion()))
+                solapa(horaInicio, horaFin,
+                       r.getFechaYHora().toLocalTime(),
+                       r.getFechaYHora().toLocalTime().plusMinutes(r.getServicio().getDuracion()))
             );
-            if (!ocupado) return true; // si al menos uno libre, esa hora es válida
+            if (!ocupado) return true; // al menos un trabajador libre para esa franja
         }
         return false;
     }
