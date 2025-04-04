@@ -173,7 +173,7 @@ const AdminCalendar = ({ trabajadores, reservas, servicios, semana, recargarRese
                             fontWeight: "bold",
                           }}
                         >
-                          
+                          Día Libre
                         </td>
                       );
                     } else {

@@ -13,6 +13,7 @@ import Perfil from './pages/Perfil';
 import { useState, useEffect } from 'react';
 import Citas from './pages/Citas';
 import NuevoTrabajador from './pages/NuevoTrabajador';
+import NuevoServicio from "./pages/NuevoServicio";
 
 
 function App() {
@@ -40,6 +41,7 @@ function App() {
         <Route path="/auth" element={<AuthMenu />} />
         <Route path="/citas" element={<Citas />} />
         <Route path="/trabajadores/nuevo" element={<NuevoTrabajador />} />
+        <Route path="/servicios/nuevo" element={<NuevoServicio />} />
       </Routes>
       <Footer />
     </>

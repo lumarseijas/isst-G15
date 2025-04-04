@@ -115,10 +115,38 @@ const Admin = () => {
       serviciosVisibles.includes(r.servicio?.id)
   );
 
+  const eliminarServicio = async (id) => {
+    if (!window.confirm("¿Seguro que quieres eliminar este servicio?")) return;
+    try {
+      await axios.delete(`http://localhost:5000/api/servicios/${id}`);
+      setServicios(servicios.filter((s) => s.id !== id));
+    } catch (error) {
+      console.error("Error al eliminar el servicio", error);
+      alert("No se pudo eliminar el servicio");
+    }
+  };
+
   return (
     <div className="admin-calendar-layout">
       <div className="sidebar">
-        <h3 style={{ marginBottom: "1rem" }}>Servicios</h3>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.5rem" }}>
+          <h3 style={{ margin: 0, color: "#5a2e7d" }}>Servicios</h3>
+          <button
+            onClick={() => navigate("/servicios/nuevo")}
+            style={{
+              backgroundColor: "transparent",
+              color: "#5a2e7d",
+              border: "none",
+              fontSize: "20px",
+              fontWeight: "bold",
+              cursor: "pointer"
+            }}
+            title="Añadir servicio"
+          >
+            +
+          </button>
+        </div>
+
         <ul style={{ padding: 0, margin: 0 }}>
           {servicios.map((s) => (
             <li key={s.id}>
@@ -128,9 +156,11 @@ const Admin = () => {
                   alignItems: "center",
                   gap: "0.5rem",
                   whiteSpace: "nowrap",
+                  justifyContent: "space-between",
                   width: "100%",
                 }}
               >
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
                 <input
                   type="checkbox"
                   checked={serviciosVisibles.includes(s.id)}
@@ -146,8 +176,28 @@ const Admin = () => {
                     flexShrink: 0,
                   }}
                 ></span>
-                <span style={{ flex: 1 }}>{s.nombre}</span>
-              </label>
+                <span style={{ flex: 1, fontWeight: "500", whiteSpace: "nowrap"  }}>{s.nombre}</span>
+                </div>
+                </label>
+                <button
+              onClick={() => eliminarServicio(s.id)}
+              style={{
+                marginLeft: "auto",
+                backgroundColor: "transparent",
+                color: "#ff0000",
+                fontSize: "24px",
+                fontWeight: "bold",
+                cursor: "pointer",
+                lineHeight: "0",
+                alignItems: "center",
+                width: "950%", //me lo he inventdo para q este a la dcha
+                padding: 0,
+              }}
+              title="Eliminar servicio"
+            >
+              –
+            </button>
+              
             </li>
           ))}
         </ul>
@@ -189,7 +239,7 @@ const Admin = () => {
                   alignItems: "flex-start"
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" , fontWeight: "500", whiteSpace: "nowrap" }}>
                   <input
                     type="checkbox"
                     checked={trabajadoresVisibles.includes(t.id)}
@@ -198,7 +248,7 @@ const Admin = () => {
                   <span>{t.nombre} ({contarReservasTrabajador(t.id)})</span>
                 </div>
                 {mediaPorTrabajador[t.id] && (
-                  <span style={{ color: "#ffc107", fontWeight: "bold", fontSize: "0.9rem", marginLeft: "1.5rem" }}>
+                  <span style={{ color: "#ffc107", fontSize: "0.9rem", marginLeft: "1.5rem" }}>
                     ⭐ {mediaPorTrabajador[t.id]} / 5
                   </span>
                 )}
