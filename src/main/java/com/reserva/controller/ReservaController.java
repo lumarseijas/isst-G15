@@ -8,6 +8,7 @@ import com.reserva.service.ReservaService;
 import com.reserva.service.ServicioService;
 import com.reserva.service.TrabajadorService;
 import com.reserva.service.UsuarioService;
+import com.reserva.repository.ReservaRepository;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,13 +28,15 @@ public class ReservaController {
     private final ReservaService reservaService;
     private final ServicioService servicioService;
     private final UsuarioService usuarioService;
+    private final ReservaRepository reservaRepository;
 
     public ReservaController(ReservaService reservaService, TrabajadorService trabajadorService,
-                             ServicioService servicioService, UsuarioService usuarioService) {
+                             ServicioService servicioService, UsuarioService usuarioService, ReservaRepository reservaRepository) {
         this.reservaService = reservaService;
         this.trabajadorService = trabajadorService;
         this.servicioService = servicioService;
         this.usuarioService = usuarioService;
+        this.reservaRepository = reservaRepository;
     }
 
     @GetMapping
@@ -161,4 +164,11 @@ public class ReservaController {
         LocalDateTime endDate = LocalDate.parse(fin).atTime(23, 59);
         return reservaService.obtenerReservasPorFecha(startDate, endDate);
     }
+
+    @GetMapping("/trabajador/{trabajadorId}")
+    public ResponseEntity<List<Reserva>> getReservasPorTrabajador(@PathVariable Long trabajadorId) {
+        List<Reserva> reservas = reservaRepository.findByTrabajadorId(trabajadorId);
+        return ResponseEntity.ok(reservas);
+    }
+
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AdminCalendar from "../components/AdminCalendar";
+import DiaLibreModal from "../components/DiaLibreModal";
 import { useNavigate } from "react-router-dom";
 
 const getSemanaConOffset = (offsetSemanas) => {
@@ -25,6 +26,7 @@ const Admin = () => {
   const [reservas, setReservas] = useState([]);
   const [semanaOffset, setSemanaOffset] = useState(0);
   const [semana, setSemana] = useState(getSemanaConOffset(0));
+  const [mostrarModalDiaLibre, setMostrarModalDiaLibre] = useState(false);
   const navigate = useNavigate();
 
   const fetchReservas = async () => {
@@ -221,6 +223,21 @@ const Admin = () => {
           >
             ➕ Añadir cita
           </button>
+          <button
+            onClick={() => setMostrarModalDiaLibre(true)}
+            style={{
+              backgroundColor: "#5a2e7d",
+              color: "white",
+              padding: "10px 15px",
+              border: "none",
+              borderRadius: "20px",
+              fontSize: "1rem",
+              fontWeight: "bold",
+              cursor: "pointer"
+            }}
+          >
+            📅 Pedir día libre
+          </button>
 
           <button onClick={() => cambiarSemana(-1)}>← Semana anterior</button>
           <button onClick={volverASemanaActual}>Semana actual</button>
@@ -237,6 +254,14 @@ const Admin = () => {
           recargarReservas={fetchReservas}
         />
       </div>
+      {mostrarModalDiaLibre && (
+  <DiaLibreModal
+    trabajadores={trabajadores}
+    onClose={() => setMostrarModalDiaLibre(false)}
+    onDiaLibreConfirmado={fetchReservas}
+  />
+)}
+
     </div>
   );
 };
