@@ -126,6 +126,18 @@ const Admin = () => {
     }
   };
 
+  const eliminarTrabajador = async (id) => {
+  if (!window.confirm("¿Seguro que quieres eliminar este trabajador?")) return;
+  try {
+    await axios.delete(`http://localhost:5000/api/trabajadores/${id}`);
+    setTrabajadores(trabajadores.filter((t) => t.id !== id));
+  } catch (error) {
+    console.error("Error al eliminar el trabajador", error);
+    alert("No se pudo eliminar el trabajador");
+  }
+};
+
+
   return (
     <div className="admin-calendar-layout">
       <div className="sidebar">
@@ -179,10 +191,10 @@ const Admin = () => {
                 <span style={{ flex: 1, fontWeight: "500", whiteSpace: "nowrap"  }}>{s.nombre}</span>
                 </div>
                 </label>
-                <button
-              onClick={() => eliminarServicio(s.id)}
-              style={{
-                marginLeft: "auto",
+              <button
+                onClick={() => eliminarServicio(s.id)}
+                style={{
+                  marginLeft: "auto",
                 backgroundColor: "transparent",
                 color: "#ff0000",
                 fontSize: "24px",
@@ -190,14 +202,14 @@ const Admin = () => {
                 cursor: "pointer",
                 lineHeight: "0",
                 alignItems: "center",
-                width: "950%", //me lo he inventdo para q este a la dcha
+                width: "920%", //me lo he inventdo para q este a la dcha
                 padding: 0,
-              }}
-              title="Eliminar servicio"
-            >
-              –
-            </button>
-              
+                }}
+                title="Eliminar servicio"
+              >
+                –
+              </button>
+
             </li>
           ))}
         </ul>
@@ -206,20 +218,12 @@ const Admin = () => {
           <button
             onClick={() => navigate("/trabajadores/nuevo")}
             style={{
-              marginLeft: "0.2rem", // empuja el botón a la derecha
-              marginRight: "0.2rem", // puedes ajustar este valor a tu gusto
               backgroundColor: "transparent",
               color: "#5a2e7d",
               border: "none",
-              borderRadius: "50%",
-              width: "25px",
-              height: "25px",
-              fontSize: "16px",
+              fontSize: "20px",
               fontWeight: "bold",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
+              cursor: "pointer"
             }}
             title="Añadir trabajador"
           >
@@ -228,32 +232,59 @@ const Admin = () => {
         </div>
         <ul style={{ padding: 0, margin: 0 }}>
           {trabajadores.map((t) => (
-            <li key={t.id}>
-              <label
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  whiteSpace: "nowrap",
-                  flexDirection: "column",
-                  alignItems: "flex-start"
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" , fontWeight: "500", whiteSpace: "nowrap" }}>
+            <li key={t.id} style={{ marginBottom: "0.5rem" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                   <input
                     type="checkbox"
                     checked={trabajadoresVisibles.includes(t.id)}
                     onChange={() => toggleTrabajador(t.id)}
                   />
-                  <span>{t.nombre} ({contarReservasTrabajador(t.id)})</span>
+                  <span style={{ fontWeight: "500", whiteSpace: "nowrap" }}>
+                    {t.nombre} ({contarReservasTrabajador(t.id)})
+                  </span>
                 </div>
                 {mediaPorTrabajador[t.id] && (
-                  <span style={{ color: "#ffc107", fontSize: "0.9rem", marginLeft: "1.5rem" }}>
+                  <span
+                    style={{
+                      color: "#ffc107",
+                      fontSize: "0.9rem",
+                      marginLeft: "1.7rem", // para alinear con el nombre
+                      whiteSpace: "nowrap"
+                    }}
+                  >
                     ⭐ {mediaPorTrabajador[t.id]} / 5
                   </span>
                 )}
-              </label>
-            </li>
+              </div>
+              <button
+                onClick={() => eliminarTrabajador(t.id)}
+                style={{
+                  backgroundColor: "transparent",
+                  color: "#ff0000",
+                  fontSize: "24px",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                  border: "none",
+                  lineHeight: "1.5",
+                  padding: 0,
+                  marginLeft: "10rem" // separación del bloque izquierdo
+                }}
+                title="Eliminar trabajador"
+              >
+                –
+              </button>
+            </div>
+          </li>
+          
+          
+            
+
+              
+
+
+            
           ))}
         </ul>
 
