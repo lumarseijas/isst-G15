@@ -10,6 +10,7 @@ import com.reserva.service.TrabajadorService;
 import com.reserva.service.UsuarioService;
 import com.reserva.repository.ReservaRepository;
 import com.reserva.service.DiaNoDisponibleService;
+import com.reserva.service.EmailService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,16 +32,18 @@ public class ReservaController {
     private final UsuarioService usuarioService;
     private final ReservaRepository reservaRepository;
     private final DiaNoDisponibleService diaNoDisponibleService;
+    private final EmailService emailService;
 
     public ReservaController(ReservaService reservaService, TrabajadorService trabajadorService,
                              ServicioService servicioService, UsuarioService usuarioService,
-                             ReservaRepository reservaRepository, DiaNoDisponibleService diaNoDisponibleService) {
+                             ReservaRepository reservaRepository, DiaNoDisponibleService diaNoDisponibleService, EmailService emailService) {
         this.reservaService = reservaService;
         this.trabajadorService = trabajadorService;
         this.servicioService = servicioService;
         this.usuarioService = usuarioService;
         this.reservaRepository = reservaRepository;
         this.diaNoDisponibleService = diaNoDisponibleService;
+        this.emailService = emailService;
     }
 
     @GetMapping
@@ -94,6 +97,29 @@ public class ReservaController {
         reserva.setTrabajador(asignado);
 
         Reserva nueva = reservaService.guardarReserva(reserva);
+
+        // ENVÍO DE CORREO DE CONFIRMACIÓN
+        if (nueva.getClienteOnline() != null) {
+            String email = nueva.getClienteOnline().getEmail();
+            String nombre = nueva.getClienteOnline().getNombre();
+            String servicioNombre = nueva.getServicio().getNombreServicio();
+            LocalDateTime fechaYHora = nueva.getFechaYHora();
+
+            String mensaje = String.format(
+                "Hola %s,\n\nTu cita para el servicio de %s ha sido confirmada para el día %s a las %s.\n\nGracias por confiar en nosotros.",
+                nombre,
+                servicioNombre,
+                fechaYHora.toLocalDate(),
+                fechaYHora.toLocalTime()
+            );
+
+            emailService.enviarCorreo(
+                email,
+                "Confirmación de tu cita en Centro Belleza",
+                mensaje
+            );
+        }
+
         return ResponseEntity.ok(nueva);
     }
 
@@ -141,13 +167,58 @@ public class ReservaController {
         reserva.setTrabajador(asignado);
 
         Reserva actualizada = reservaService.guardarReserva(reserva);
+        if (actualizada.getClienteOnline() != null) {
+            String email = actualizada.getClienteOnline().getEmail();
+            String nombre = actualizada.getClienteOnline().getNombre();
+            String servicioNombre = actualizada.getServicio().getNombreServicio();
+            LocalDateTime fechaYHora = actualizada.getFechaYHora();
+        
+            String mensaje = String.format(
+                "Hola %s,\n\nTu cita para el servicio de %s ha sido modificada. La nueva fecha es el %s a las %s.\n\nSi no solicitaste este cambio o necesitas otra hora, por favor contáctanos.",
+                nombre,
+                servicioNombre,
+                fechaYHora.toLocalDate(),
+                fechaYHora.toLocalTime()
+            );
+        
+            System.out.println("📨 Notificación de modificación enviada a: " + email);
+            emailService.enviarCorreo(email, "Tu cita ha sido modificada", mensaje);
+        }
+        
         return ResponseEntity.ok(actualizada);
     }
 
     @DeleteMapping("/{id}")
-    public void eliminarReserva(@PathVariable Long id) {
+public ResponseEntity<?> eliminarReserva(@PathVariable Long id) {
+    Optional<Reserva> reservaOpt = reservaService.obtenerPorId(id);
+
+    if (reservaOpt.isPresent()) {
+        Reserva reserva = reservaOpt.get();
         reservaService.eliminarReserva(id);
+
+        if (reserva.getClienteOnline() != null) {
+            String email = reserva.getClienteOnline().getEmail();
+            String nombre = reserva.getClienteOnline().getNombre();
+            String servicioNombre = reserva.getServicio().getNombreServicio();
+            LocalDateTime fechaYHora = reserva.getFechaYHora();
+
+            String mensaje = String.format(
+                "Hola %s,\n\nLamentamos informarte que tu cita para el servicio de %s programada para el día %s a las %s ha sido cancelada por el centro.\n\nPuedes hacer otra reserva en el horario que prefieras desde la web.",
+                nombre,
+                servicioNombre,
+                fechaYHora.toLocalDate(),
+                fechaYHora.toLocalTime()
+            );
+
+            System.out.println("📨 Notificación de cancelación enviada a: " + email);
+            emailService.enviarCorreo(email, "Tu cita ha sido cancelada", mensaje);
+        }
+
+        return ResponseEntity.ok().build();
     }
+
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Reserva no encontrada.");
+}
 
     @GetMapping("/rango-fechas")
     public List<Reserva> obtenerReservasPorFecha(@RequestParam String inicio, @RequestParam String fin) {
