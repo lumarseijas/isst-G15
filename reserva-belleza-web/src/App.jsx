@@ -14,6 +14,8 @@ import { useState, useEffect } from 'react';
 import Citas from './pages/Citas';
 import NuevoTrabajador from './pages/NuevoTrabajador';
 import NuevoServicio from "./pages/NuevoServicio";
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
 
 
 function App() {
@@ -27,25 +29,25 @@ function App() {
   }, []);
 
   return (
-    <>
-      <Navbar usuario={usuario} setUsuario={setUsuario}/>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/servicios" element={<Servicios />} />
-        <Route path="/reservas" element={<Reservas />} />
-        <Route path="/contacto" element={<Contacto />} />
-        <Route path="/admin" element={usuario?.tipo === "ADMINISTRADOR" ? ( <Admin />):( <Navigate to="/" replace />)} />
-        <Route path="/login" element={<Login setUsuario={setUsuario} />} />
-        <Route path="/registro" element={<Registro />} />
-        <Route path="/perfil" element={<Perfil />} />
-        <Route path="/auth" element={<AuthMenu />} />
-        <Route path="/citas" element={<Citas />} />
-        <Route path="/trabajadores/nuevo" element={<NuevoTrabajador />} />
-        <Route path="/servicios/nuevo" element={<NuevoServicio />} />
-      </Routes>
-      <Footer />
-    </>
-  );
+    <GoogleOAuthProvider clientId="595824223955-b2hpap1m2vhqs4d7od9sbtt0ab1pam7d.apps.googleusercontent.com">
+    <Navbar usuario={usuario} setUsuario={setUsuario} />
+    <Routes>
+    <Route path="/" element={<Home />} />
+    <Route path="/servicios" element={<Servicios />} />
+    <Route path="/reservas" element={<Reservas />} />
+    <Route path="/contacto" element={<Contacto />} />
+    <Route path="/admin" element={usuario?.tipo === "ADMINISTRADOR" ? ( <Admin />):( <Navigate to="/" replace />)} />
+    <Route path="/login" element={<Login setUsuario={setUsuario} />} />
+    <Route path="/registro" element={<Registro />} />
+    <Route path="/perfil" element={<Perfil />} />
+    <Route path="/auth" element={<AuthMenu />} />
+    <Route path="/citas" element={<Citas />} />
+    <Route path="/trabajadores/nuevo" element={<NuevoTrabajador />} />
+    <Route path="/servicios/nuevo" element={<NuevoServicio />} />
+    </Routes>
+    <Footer />
+    </GoogleOAuthProvider>
+      );
 }
 
 export default App;
