@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const Login = ({ setUsuario }) => {
   const [datos, setDatos] = useState({ email: '', password: '' });
@@ -23,7 +24,7 @@ const Login = ({ setUsuario }) => {
       if (response.ok) {
         localStorage.setItem('token', result.token);
         localStorage.setItem('usuario', JSON.stringify(result.usuario));
-        setUsuario(result.usuario); 
+        setUsuario(result.usuario);
         alert("Inicio de sesión exitoso");
         navigate('/');
         window.location.reload();
@@ -36,18 +37,58 @@ const Login = ({ setUsuario }) => {
     }
   };
 
+  const handleCallbackResponse = async (response) => {
+    console.log("Respuesta de Google:", response);
+    const idToken = response.credential;
+    console.log("ID Token recibido:", idToken);
+
+    try {
+      const res = await axios.post("http://localhost:5000/api/oauth/google", {
+        token: idToken,
+      });
+
+      const usuario = res.data;
+      console.log("Respuesta del backend:", usuario);
+
+      localStorage.setItem("usuario", JSON.stringify(usuario));
+      setUsuario(usuario);
+      alert(`¡Bienvenido/a ${usuario.nombre}!`);
+      navigate('/');
+      window.location.reload();
+    } catch (e) {
+      console.error("Error en login con Google:", e);
+      alert("Hubo un problema al iniciar sesión con Google.");
+    }
+  };
+
+  useEffect(() => {
+    if (window.google) {
+      window.google.accounts.id.initialize({
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        callback: handleCallbackResponse,
+        ux_mode: "popup",
+        auto_select: false,
+      });
+      console.log("🧪 Client ID cargado:", import.meta.env.VITE_GOOGLE_CLIENT_ID);
+
+
+      window.google.accounts.id.renderButton(
+        document.getElementById("google-login-div"),
+        { theme: "outline", size: "large" }
+      );
+    } else {
+      console.error("Google Identity Services no se ha cargado.");
+    }
+  }, []);
+
   return (
     <div className="form-container">
       <h2>Iniciar Sesión</h2>
-
-      {/* Login tradicional */}
       <form onSubmit={handleSubmit} className="formulario">
         <label>Email</label>
         <input type="email" name="email" value={datos.email} onChange={handleChange} required />
-
         <label>Contraseña</label>
         <input type="password" name="password" value={datos.password} onChange={handleChange} required />
-
         <button type="submit">Ingresar</button>
       </form>
 
@@ -56,26 +97,8 @@ const Login = ({ setUsuario }) => {
       </p>
 
       <hr style={{ margin: '20px 0' }} />
-
-      {/* Botón para iniciar sesión con Google */}
-      <div style={{ textAlign: 'center' }}>
-        <p>O inicia sesión con Google</p>
-        <button
-          onClick={() => {
-            window.location.href = "http://localhost:5000/oauth2/authorization/google";
-          }}
-          style={{
-            padding: '10px 20px',
-            backgroundColor: '#4285F4',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontWeight: 'bold'
-          }}
-        >
-          Iniciar sesión con Google
-        </button>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div id="google-login-div"></div>
       </div>
     </div>
   );

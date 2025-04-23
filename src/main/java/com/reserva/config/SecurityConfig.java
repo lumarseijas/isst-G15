@@ -4,10 +4,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
- 
+import com.reserva.security.CustomOAuth2SuccessHandler;
+import lombok.RequiredArgsConstructor;
+
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
- 
+    private final CustomOAuth2SuccessHandler successHandler;
+    
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -18,7 +22,7 @@ public class SecurityConfig {
                 .anyRequest().permitAll() 
             )
             .oauth2Login(oauth2 -> oauth2
-                .defaultSuccessUrl("/auth/success", true) // redirecciÃ³n tras login exitoso
+                .successHandler(successHandler)
             );
  
         return http.build();

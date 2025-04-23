@@ -1,0 +1,91 @@
+package com.reserva.controller;
+
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.reserva.model.Usuario;
+import com.reserva.model.Usuario.TipoUsuario;
+import com.reserva.repository.UsuarioRepository;
+import com.reserva.service.JwtService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.*;
+
+@RestController
+@RequestMapping("/api/oauth")
+@RequiredArgsConstructor
+public class OAuthController {
+
+    private final UsuarioRepository usuarioRepository;
+    private final JwtService jwtService;
+
+    @Value("${spring.security.oauth2.client.registration.google.client-id}")
+    private String clientId;
+
+    @SuppressWarnings("deprecation")
+    private static final JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+    
+    @PostMapping("/google")
+    public ResponseEntity<?> loginConGoogle(@RequestBody Map<String, String> request) {
+        String tokenId = request.get("token");
+
+        System.out.println("ðŸ“¥ [BACKEND] Token recibido:");
+        System.out.println(tokenId);
+
+        try {
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
+                    new NetHttpTransport(),
+                    jsonFactory)
+                    .setAudience(Collections.singletonList(clientId))
+                    .build();
+
+            GoogleIdToken idToken = verifier.verify(tokenId);
+
+            if (idToken != null) {
+                GoogleIdToken.Payload payload = idToken.getPayload();
+
+                System.out.println("âœ… [BACKEND] Token vÃ¡lido. Payload:");
+                System.out.println(payload.toPrettyString());
+
+                String email = payload.getEmail();
+                String nombre = (String) payload.get("name");
+                String avatar = (String) payload.get("picture");
+
+                Usuario usuario = usuarioRepository.findByEmail(email).orElseGet(() -> {
+                    Usuario nuevo = new Usuario();
+                    nuevo.setEmail(email);
+                    nuevo.setNombre(nombre);
+                    nuevo.setAvatar(avatar);
+                    nuevo.setTipo(TipoUsuario.CLIENTE_ONLINE);
+                    nuevo.setPassword("google-" + UUID.randomUUID()); // dummy password
+                    return usuarioRepository.save(nuevo);
+                });
+
+                String jwt = jwtService.generateToken(usuario);
+
+                Map<String, Object> responseBody = new HashMap<>();
+                responseBody.put("token", jwt);
+                responseBody.put("nombre", usuario.getNombre());
+                responseBody.put("email", usuario.getEmail());
+                responseBody.put("tipo", usuario.getTipo());
+
+                return ResponseEntity.ok(responseBody);
+
+            } else {
+                System.out.println("âŒ [BACKEND] Token invÃ¡lido.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token invÃ¡lido");
+            }
+
+        } catch (Exception e) {
+            System.out.println("âŒ [BACKEND] Error al verificar el token:");
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al verificar el token: " + e.getMessage());
+        }
+    }
+}

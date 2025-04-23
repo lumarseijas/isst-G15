@@ -29,7 +29,7 @@ function App() {
   }, []);
 
   return (
-    <GoogleOAuthProvider clientId="595824223955-b2hpap1m2vhqs4d7od9sbtt0ab1pam7d.apps.googleusercontent.com">
+    <GoogleOAuthProvider clientId="595824223955-ekfqfvhsfl8ihkv616ql9dfumi28dg4i.apps.googleusercontent.com">
     <Navbar usuario={usuario} setUsuario={setUsuario} />
     <Routes>
     <Route path="/" element={<Home />} />

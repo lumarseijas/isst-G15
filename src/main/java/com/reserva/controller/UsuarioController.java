@@ -82,10 +82,10 @@ public ResponseEntity<?> actualizarUsuario(@PathVariable Long id, @RequestBody U
             }
         }
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales invÃ¡lidas");
     }
 
-    // (otros métodos: obtener, crear usuario, etc.)
+    // (otros mÃ©todos: obtener, crear usuario, etc.)
     @GetMapping
     public List<Usuario> obtenerTodos() {
         return usuarioService.obtenerTodos();

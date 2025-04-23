@@ -4,7 +4,7 @@ public class AuthRequest {
     private String email;
     private String password;
 
-    // Constructor vacío
+    // Constructor vacÃ­o
     public AuthRequest() {}
 
     // Getters y Setters
