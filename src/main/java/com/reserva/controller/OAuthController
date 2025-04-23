@@ -33,7 +33,7 @@ public class OAuthController {
     @PostMapping("/google")
     public ResponseEntity<?> loginConGoogle(@RequestBody Map<String, String> request) {
         String tokenId = request.get("token");
-
+        System.out.println("Recibido login con Google");
         System.out.println("ðŸ“¥ [BACKEND] Token recibido:");
         System.out.println(tokenId);
 
