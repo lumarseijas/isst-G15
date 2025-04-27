@@ -15,6 +15,8 @@ import Citas from './pages/Citas';
 import NuevoTrabajador from './pages/NuevoTrabajador';
 import NuevoServicio from "./pages/NuevoServicio";
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import Oauth2Redirect from './components/Oauth2Redirect';
+ 
 
 
 
@@ -44,6 +46,7 @@ function App() {
     <Route path="/citas" element={<Citas />} />
     <Route path="/trabajadores/nuevo" element={<NuevoTrabajador />} />
     <Route path="/servicios/nuevo" element={<NuevoServicio />} />
+    <Route path="/oauth2/redirect" element={<Oauth2Redirect setUsuario={setUsuario} />} />
     </Routes>
     <Footer />
     </GoogleOAuthProvider>
