@@ -1,30 +1,35 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
- 
-const Oauth2Redirect = ({ setUsuario }) => {
+
+const OAuth2Redirect = ({ setUsuario }) => {
   const navigate = useNavigate();
- 
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+
+    const id = params.get('id');
     const nombre = params.get('nombre');
     const email = params.get('email');
     const token = params.get('token');
- 
-    if (token && nombre && email) {
-      const usuario = { nombre, email };
-      localStorage.setItem('token', token);
+
+    if (id && nombre && email && token) {
+      const usuario = { id, nombre, email };
+
       localStorage.setItem('usuario', JSON.stringify(usuario));
+      localStorage.setItem('token', token);
       setUsuario(usuario);
-      alert('Inicio de sesión con Google exitoso');
+
+      alert(`¡Bienvenido/a ${nombre}!`);
+
       navigate('/');
       window.location.reload();
     } else {
-      alert('Error en el login con Google');
+      alert('Error al iniciar sesión con Google.');
       navigate('/login');
     }
-  }, [navigate, setUsuario]);
- 
-  return <p>Procesando inicio de sesión con Google...</p>;
+  }, []);
+
+  return <div>Cargando...</div>;
 };
- 
-export default Oauth2Redirect;
+
+export default OAuth2Redirect;

@@ -15,8 +15,7 @@ import Citas from './pages/Citas';
 import NuevoTrabajador from './pages/NuevoTrabajador';
 import NuevoServicio from "./pages/NuevoServicio";
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import Oauth2Redirect from './components/Oauth2Redirect';
- 
+import Oauth2Redirect from './pages/Oauth2Redirect';
 
 
 
