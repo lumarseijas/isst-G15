@@ -76,5 +76,90 @@ public class TestUsuarioController {
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("Usuario no encontrado"));
     }
+    @Test
+    public void testRegistroNuevoUsuario() throws Exception {
+        Usuario nuevoUsuario = new Usuario();
+        nuevoUsuario.setEmail("nuevo@test.com");
+        nuevoUsuario.setPassword("1234");
+        nuevoUsuario.setNombre("Nuevo");
+        nuevoUsuario.setTelefono("600000000");
+    
+        // No existe aún
+        Mockito.when(usuarioService.obtenerPorEmail("nuevo@test.com")).thenReturn(Optional.empty());
+        Mockito.when(usuarioService.guardarUsuario(Mockito.any(Usuario.class))).thenReturn(nuevoUsuario);
+    
+        mockMvc.perform(post("/api/usuarios/registro")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                        "email": "nuevo@test.com",
+                        "password": "1234",
+                        "nombre": "Nuevo",
+                        "telefono": "600000000"
+                    }
+                """))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.email").value("nuevo@test.com"));
+    }
+    
+    @Test
+    public void testRegistroConEmailExistente() throws Exception {
+        Usuario existente = new Usuario();
+        existente.setEmail("existente@test.com");
+    
+        Mockito.when(usuarioService.obtenerPorEmail("existente@test.com")).thenReturn(Optional.of(existente));
+    
+        mockMvc.perform(post("/api/usuarios/registro")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                        "email": "existente@test.com",
+                        "password": "1234"
+                    }
+                """))
+            .andExpect(status().isConflict())
+            .andExpect(content().string("Ya existe un usuario con ese email"));
+    }
+    
+    @Test
+    public void testLoginCorrecto() throws Exception {
+        Usuario usuario = new Usuario();
+        usuario.setEmail("login@test.com");
+        usuario.setPassword("hashedpass");
+    
+        Mockito.when(usuarioService.obtenerPorEmail("login@test.com")).thenReturn(Optional.of(usuario));
+        Mockito.when(passwordEncoder.matches("1234", "hashedpass")).thenReturn(true);
+        Mockito.when(jwtUtil.generateToken("login@test.com")).thenReturn("fake-jwt-token");
+    
+        mockMvc.perform(post("/api/usuarios/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                        "email": "login@test.com",
+                        "password": "1234"
+                    }
+                """))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.token").value("fake-jwt-token"))
+            .andExpect(jsonPath("$.usuario.email").value("login@test.com"));
+    }
+    
+    @Test
+    public void testLoginCredencialesInvalidas() throws Exception {
+        Mockito.when(usuarioService.obtenerPorEmail("invalido@test.com")).thenReturn(Optional.empty());
+    
+        mockMvc.perform(post("/api/usuarios/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                        "email": "invalido@test.com",
+                        "password": "wrong"
+                    }
+                """))
+            .andExpect(status().isUnauthorized())
+            .andExpect(content().string("Credenciales inválidas"));
+    }
+    
+
 }
 
