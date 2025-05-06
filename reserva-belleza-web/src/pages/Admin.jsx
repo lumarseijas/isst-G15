@@ -4,6 +4,18 @@ import AdminCalendar from "../components/AdminCalendar";
 import DiaLibreModal from "../components/DiaLibreModal";
 import { useNavigate } from "react-router-dom";
 
+// Función para generar colores únicos con HSL
+const generarColoresUnicos = (cantidad) => {
+  const colores = [];
+  const saturacion = 70;
+  const luminosidad = 60;
+  for (let i = 0; i < cantidad; i++) {
+    const hue = Math.floor((360 / cantidad) * i);
+    colores.push(`hsl(${hue}, ${saturacion}%, ${luminosidad}%)`);
+  }
+  return colores;
+};
+
 const getSemanaConOffset = (offsetSemanas) => {
   const hoy = new Date();
   const dia = hoy.getDay() || 7;
@@ -48,7 +60,6 @@ const Admin = () => {
         setTrabajadores(trabajadoresRes.data);
         setTrabajadoresVisibles(trabajadoresRes.data.map((t) => t.id));
 
-        // Cargar medias por trabajador
         trabajadoresRes.data.forEach(async (trabajador) => {
           try {
             const res = await axios.get(`http://localhost:5000/api/valoraciones/media/trabajador/${trabajador.id}`);
@@ -63,11 +74,11 @@ const Admin = () => {
           }
         });
 
-        const colores = ["#00BFFF", "#FF6347", "#32CD32", "#FF69B4", "#8A2BE2", "#FFA500", "#9370DB"];
         const serviciosRes = await axios.get("http://localhost:5000/api/servicios");
+        const colores = generarColoresUnicos(serviciosRes.data.length);
         const serviciosConColor = serviciosRes.data.map((s, i) => ({
           ...s,
-          color: colores[i % colores.length],
+          color: colores[i],
           nombre: s.nombreServicio,
         }));
         setServicios(serviciosConColor);
@@ -127,16 +138,15 @@ const Admin = () => {
   };
 
   const eliminarTrabajador = async (id) => {
-  if (!window.confirm("¿Seguro que quieres eliminar este trabajador?")) return;
-  try {
-    await axios.delete(`http://localhost:5000/api/trabajadores/${id}`);
-    setTrabajadores(trabajadores.filter((t) => t.id !== id));
-  } catch (error) {
-    console.error("Error al eliminar el trabajador", error);
-    alert("No se pudo eliminar el trabajador");
-  }
-};
-
+    if (!window.confirm("¿Seguro que quieres eliminar este trabajador?")) return;
+    try {
+      await axios.delete(`http://localhost:5000/api/trabajadores/${id}`);
+      setTrabajadores(trabajadores.filter((t) => t.id !== id));
+    } catch (error) {
+      console.error("Error al eliminar el trabajador", error);
+      alert("No se pudo eliminar el trabajador");
+    }
+  };
 
   return (
     <div className="admin-calendar-layout">
