@@ -1,7 +1,6 @@
 package com.reserva;
 
 import com.reserva.controller.DisponibilidadController;
-import com.reserva.model.Reserva;
 import com.reserva.model.Servicio;
 import com.reserva.model.Trabajador;
 import com.reserva.service.*;
@@ -10,7 +9,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
@@ -27,16 +26,16 @@ public class TestDisponibilidadController {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private ReservaService reservaService;
 
-    @MockBean
+    @MockitoBean
     private ServicioService servicioService;
 
-    @MockBean
+    @MockitoBean
     private TrabajadorService trabajadorService;
 
-    @MockBean
+    @MockitoBean
     private DiaNoDisponibleService diaNoDisponibleService;
 
     @Test
