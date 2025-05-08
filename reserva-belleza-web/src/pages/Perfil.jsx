@@ -8,9 +8,13 @@ const avataresDisponibles = [
   "/img/avatar4.png"
 ];
 
+
 const Perfil = () => {
   const navigate = useNavigate();
   const usuarioGuardado = JSON.parse(localStorage.getItem('usuario'));
+  const [passActual, setPassActual] = useState("");
+  const [passNueva, setPassNueva] = useState("");
+
   const [datos, setDatos] = useState({
     nombre: '',
     email: '',
@@ -39,7 +43,7 @@ const Perfil = () => {
         setDatos(usuarioFormateado);
       })
       .catch(error => console.error("Error al cargar los datos del usuario:", error));
-  }, [localStorage.getItem('usuario')]); // 👈 fuerza el efecto si cambia el usuario en localStorage
+  }, [localStorage.getItem('usuario')]); // fuerza el efecto si cambia el usuario en localStorage
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -116,8 +120,60 @@ const Perfil = () => {
         </div>
         <img src={datos.avatar} alt="Vista previa" className="avatar-preview" />
 
-        <button type="submit">Actualizar</button>
-        <button type="button" className="btn-cancelar" onClick={() => navigate('/')}>Cancelar</button>
+        <div className="formulario-cambiar-pass">
+  <label>Cambiar contraseña</label>
+  {/* CAMBIO DE CONTRASEÑA */}
+<label style={{ marginTop: '20px' }}>Contraseña actual</label>
+<input
+  type="password"
+  name="passwordActual"
+  value={passActual}
+  onChange={(e) => setPassActual(e.target.value)}
+  className="input"
+/>
+
+<label style={{ marginTop: '10px' }}>Nueva contraseña</label>
+<input
+  type="password"
+  name="passwordNueva"
+  value={passNueva}
+  onChange={(e) => setPassNueva(e.target.value)}
+  className="input"
+/>
+
+<button
+  type="button"
+  style={{ marginTop: '15px', marginBottom: '20px' }}
+  className="btn-editar"
+  onClick={async () => {
+    const email = JSON.parse(localStorage.getItem("usuario"))?.email;
+
+    const response = await fetch("http://localhost:5000/api/usuarios/cambiar-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email,
+        actual: passActual,
+        nueva: passNueva
+      })
+    });
+
+    const msg = await response.text();
+    if (response.ok) {
+      alert(msg);
+      setPassActual("");
+      setPassNueva("");
+    } else {
+      alert("❌ " + msg);
+    }
+  }}
+>
+  Cambiar contraseña
+</button>
+
+</div>
+<button type="submit">Actualizar</button>
+<button type="button" className="btn-cancelar" onClick={() => navigate('/')}>Cancelar</button>
       </form>
     </div>
   );

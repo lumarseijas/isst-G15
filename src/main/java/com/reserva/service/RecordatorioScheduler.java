@@ -11,6 +11,10 @@ import java.util.List;
 
 @Component
 public class RecordatorioScheduler {
+    public RecordatorioScheduler() {
+        System.out.println("✅ RecordatorioScheduler cargado correctamente por Spring.");
+    }
+
 
     @Autowired
     private ReservaService reservaService;
@@ -20,7 +24,9 @@ public class RecordatorioScheduler {
 
     // Se ejecuta todos los días a las 9:00 de la mañana
     @Scheduled(cron = "0 0 9 * * *")
+   //@Scheduled(cron = "0 */1 * * * *") // cada minuto
     public void enviarRecordatorios() {
+        System.out.println("Recordatorio ejecutado " + java.time.LocalDateTime.now());
         LocalDateTime inicio = LocalDateTime.now().plusDays(1).withHour(0).withMinute(0);
         LocalDateTime fin = inicio.withHour(23).withMinute(59);
 
@@ -36,7 +42,7 @@ public class RecordatorioScheduler {
                     r.getServicio().getNombreServicio()
                 );
 
-                System.out.println("📨 Enviando recordatorio a: " + cliente.getEmail());
+                System.out.println("Enviando recordatorio a: " + cliente.getEmail());
                 emailService.enviarCorreo(
                     cliente.getEmail(),
                     "Recordatorio: cita mañana en Centro Belleza",

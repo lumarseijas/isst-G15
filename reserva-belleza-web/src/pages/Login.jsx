@@ -46,6 +46,28 @@ const Login = ({ setUsuario }) => {
         <input type="password" name="password" value={datos.password} onChange={handleChange} required />
         <button type="submit">Ingresar</button>
       </form>
+      <p
+      style={{ color: '#007bff', cursor: 'pointer', marginTop: '10px', textAlign: 'center' }}
+      onClick={() => {
+        const email = prompt("Introduce tu correo para recuperar la contraseña:");
+        if (!email) return;
+
+        fetch("http://localhost:5000/api/usuarios/recuperar", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email })
+        })
+          .then(res => {
+            if (!res.ok) throw new Error("No se pudo recuperar la contraseña.");
+            return res.text();
+          })
+          .then(msg => alert(msg))
+          .catch(() => alert("No se encontró una cuenta con ese email."));
+      }}
+    >
+      ¿Olvidaste tu contraseña?
+    </p>
+
 
       <p className="registro-link">
         ¿No estás registrado? Regístrate <span onClick={() => navigate('/registro')}>aquí</span>

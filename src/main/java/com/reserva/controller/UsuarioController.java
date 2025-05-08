@@ -9,9 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
+import com.reserva.service.EmailService;
+import com.reserva.repository.UsuarioRepository;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -26,6 +30,13 @@ public class UsuarioController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private EmailService emailService;
+
 
     @GetMapping("/{id}")
     public ResponseEntity<?> obtenerUsuarioPorId(@PathVariable Long id) {
@@ -86,8 +97,55 @@ public class UsuarioController {
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
     }
+    // UsuarioController.java
 
-    // (otros mÃ©todos: obtener, crear usuario, etc.)
+    @PostMapping("/recuperar")
+    public ResponseEntity<?> recuperarPassword(@RequestBody Map<String, String> payload) {
+        String email = payload.get("email");
+    
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
+        if (usuarioOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No existe una cuenta con ese email.");
+        }
+    
+        Usuario usuario = usuarioOpt.get();
+        String nuevaPass = UUID.randomUUID().toString().substring(0, 8); // 8 caracteres aleatorios
+        usuario.setPassword(passwordEncoder.encode(nuevaPass)); // ¡IMPORTANTE! Guarda la contraseña hasheada
+        usuarioRepository.save(usuario);
+    
+        emailService.enviarCorreo(
+            usuario.getEmail(),
+            "Recuperación de contraseña",
+            "Tu nueva contraseña es: " + nuevaPass
+        );
+    
+        return ResponseEntity.ok("Se ha enviado una nueva contraseña a tu correo.");
+    }
+    @PostMapping("/cambiar-password")
+    public ResponseEntity<?> cambiarPassword(@RequestBody Map<String, String> payload) {
+        String email = payload.get("email");
+        String actual = payload.get("actual");
+        String nueva = payload.get("nueva");
+    
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
+        if (usuarioOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado.");
+        }
+    
+        Usuario usuario = usuarioOpt.get();
+    
+        if (!passwordEncoder.matches(actual, usuario.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Contraseña actual incorrecta.");
+        }
+    
+        usuario.setPassword(passwordEncoder.encode(nueva));
+        usuarioRepository.save(usuario);
+    
+        return ResponseEntity.ok("Contraseña actualizada correctamente.");
+    }
+    
+
+    // (otros metodos: obtener, crear usuario, etc.)
     @GetMapping
     public List<Usuario> obtenerTodos() {
         return usuarioService.obtenerTodos();
