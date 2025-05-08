@@ -103,7 +103,7 @@ http://localhost:5173
 - Consulta horarios disponibles
 - Confirma la cita
 
-Recibirás un email de confirmación y, si usas Google Calendar, se añadirá automáticamente.
+Recibirás un email de confirmación y, si usen el apartado de "Mis Citas" puedes añadir a Google Calendar la cita o bien descargar un archivo .ics para añadirlo a otros calendarios como iCloud, Outlook...
 
 ### 3. Gestionar tus citas
 - En **"Mis Citas"** puedes ver, cancelar o modificar tus reservas
