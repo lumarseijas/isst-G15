@@ -125,8 +125,8 @@ Recibirás un email de confirmación y, si usen el apartado de "Mis Citas" puede
 ##  Pruebas
 
 -  Pruebas unitarias con **JUnit**
--  Pruebas funcionales con **Selenium**
--  Pruebas de integración con **Manuales**
+-  Pruebas funcionales con **Manuales**
+-  Pruebas de integración con **Postman**
 
 ---
 
