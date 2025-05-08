@@ -74,11 +74,11 @@ CREATE DATABASE base;
 ### 3. Ejecutar el backend
 Desde la raíz del proyecto backend (donde está el pom.xml):
 ```bash
-mvn spring-boot:run;
+mvn spring-boot:run
 ```
 Esto lanzará el backend en:
 ```bash
-http://localhost:5000;
+http://localhost:5000
 ```
 ### 4. Ver la página web: 
 Desde la carpeta `reserva-belleza-web`, ejecuta:
@@ -102,23 +102,27 @@ http://localhost:5173
 - Consulta horarios disponibles
 - Confirma la cita
 
-Recibirás un email de confirmación y, si usen el apartado de "Mis Citas" puedes añadir a Google Calendar la cita o bien descargar un archivo .ics para añadirlo a otros calendarios como iCloud, Outlook...
+Recibirás un email de confirmación y, en el apartado de **"Mis Citas"** puedes añadirla a Google Calendar la cita o bien descargar un archivo .ics para añadirlo a otros calendarios como iCloud, Outlook...
+
+Además 24 horas antes, recibirás automáticamente un email de recordatorio de tu cita. 
 
 ### 3. Gestionar tus citas
 - En **"Mis Citas"** puedes ver, cancelar o modificar tus reservas
+- No podrás cancelar ni modificar tu reserva si quedan menos de 24 horas
 
 ### 4. Valorar un servicio
 - Después de la cita, puedes dejar una valoración y comentario
-- También puedes ver las valoraciones de otros usuarios
+- También se pueden ver las valoraciones de otros usuarios desde la página de **Servicios**
 
+### 5. Gestionar tu perfil
+- Al hacer click en tu avatar, puedes modificar la información de tu perfil: nombre, teléfono o avatar
+  
 ---
-
 ## Seguridad
 
 -  Autenticación con Google OAuth2
 -  Contraseñas cifradas (bcrypt)
 -  Acceso restringido por roles (cliente/admin)
--  Cumplimiento con GDPR
 
 ---
 
