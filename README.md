@@ -6,7 +6,7 @@ Este proyecto es una plataforma de reservas online dirigida a pequeños negocios
 
 ## Características Principales
 
--  Registro e inicio de sesión con autenticación segura (JWT y Google Sign-In)
+-  Registro e inicio de sesión con autenticación segura (Google Sign-In)
 -  Gestión de citas online y presenciales
 -  Visualización de disponibilidad y servicios
 -  Panel de administración para el negocio
@@ -24,18 +24,17 @@ Este proyecto es una plataforma de reservas online dirigida a pequeños negocios
 -  CSS (estilos)
 -  Axios (peticiones HTTP)
 -  React Router DOM (rutas)
--  LocalStorage + JWT
+-  LocalStorage 
 
 ### Backend
 -  Java + Spring Boot
--  Spring Security + JWT + OAuth2
+-  Spring Security + OAuth2
 -  Spring Data JPA + Hibernate
 -  MySQL (base de datos)
 -  JavaMailSender (notificaciones por correo)
 
 ### Otros
 -  JUnit (pruebas unitarias)
--  Selenium (pruebas funcionales)
 -  Postman (pruebas API)
 -  GitHub: [Repositorio](https://github.com/lumarseijas/isst-G15)
 -  Trello: [Trello](https://trello.com/b/uJJV9c7g/isst-grupo15-belleza)
@@ -116,7 +115,7 @@ Recibirás un email de confirmación y, si usen el apartado de "Mis Citas" puede
 
 ## Seguridad
 
--  Autenticación con JWT y Google OAuth2
+-  Autenticación con Google OAuth2
 -  Contraseñas cifradas (bcrypt)
 -  Acceso restringido por roles (cliente/admin)
 -  Cumplimiento con GDPR
@@ -127,7 +126,7 @@ Recibirás un email de confirmación y, si usen el apartado de "Mis Citas" puede
 
 -  Pruebas unitarias con **JUnit**
 -  Pruebas funcionales con **Selenium**
--  Pruebas de integración con **Postman**
+-  Pruebas de integración con **Manuales**
 
 ---
 
