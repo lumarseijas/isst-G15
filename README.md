@@ -31,7 +31,7 @@ Este proyecto es una plataforma de reservas online dirigida a pequeños negocios
 -  Spring Security + OAuth2
 -  Spring Data JPA + Hibernate
 -  MySQL (base de datos)
--  JavaMailSender (notificaciones por correo)
+-  Spring-boot starter-mail (notificaciones por correo)
 
 ### Otros
 -  JUnit (pruebas unitarias)
@@ -115,7 +115,7 @@ Además 24 horas antes, recibirás automáticamente un email de recordatorio de 
 - También se pueden ver las valoraciones de otros usuarios desde la página de **Servicios**
 
 ### 5. Gestionar tu perfil
-- Al hacer click en tu avatar, puedes modificar la información de tu perfil: nombre, teléfono o avatar
+- Al hacer click en tu avatar, puedes modificar la información de tu perfil: nombre, teléfono, avatar o contraseña
   
 ---
 ## Seguridad
