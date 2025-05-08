@@ -1,3 +1,46 @@
+.btn-calendar {
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.btn-calendar img {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+}
+
+
+.btn-calendar:hover {
+  background-color: #3367d6;
+}
+
+.btn-ics {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.btn-ics:hover {
+  background-color: #5a6268;
+}
+
+
 /* ==== COLORES PRINCIPALES ==== */
 :root {
   --color-fondo: #f5e9ff;

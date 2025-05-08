@@ -96,6 +96,47 @@ const Citas = () => {
       });
   };
 
+  const formatearFechaParaGoogle = (fechaYHora, duracionMinutos) => {
+    const inicio = new Date(fechaYHora);
+    const fin = new Date(inicio.getTime() + duracionMinutos * 60000);
+    const format = (date) => date.toISOString().replace(/-|:|\.\d\d\d/g, "");
+    return { start: format(inicio), end: format(fin) };
+  };
+
+  const abrirGoogleCalendar = (cita) => {
+    const { start, end } = formatearFechaParaGoogle(cita.fechaYHora, cita.servicio.duracion);
+    const url = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
+      cita.servicio.nombreServicio
+    )}&dates=${start}/${end}&details=${encodeURIComponent(
+      `Reserva con ${cita.trabajador?.nombre || "nuestro equipo"}`
+    )}&location=${encodeURIComponent("Centro de Belleza")}&sf=true&output=xml`;
+    window.open(url, "_blank");
+  };
+
+  const descargarICS = (cita) => {
+    const inicio = new Date(cita.fechaYHora);
+    const fin = new Date(inicio.getTime() + cita.servicio.duracion * 60000);
+    const formatICS = (date) => date.toISOString().replace(/-|:|\.\d\d\d/g, "");
+    const contenidoICS = `
+BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+SUMMARY:${cita.servicio.nombreServicio}
+DTSTART:${formatICS(inicio)}
+DTEND:${formatICS(fin)}
+LOCATION:Centro de Belleza
+DESCRIPTION:Reserva con ${cita.trabajador?.nombre || "nuestro equipo"}
+END:VEVENT
+END:VCALENDAR`.trim();
+
+    const blob = new Blob([contenidoICS], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "reserva.ics";
+    link.click();
+  };
+
   const citasFuturas = citas.filter(cita => new Date(cita.fechaYHora) >= ahora);
   const citasPasadas = citas.filter(cita => new Date(cita.fechaYHora) < ahora);
   const citasAMostrar = mostrarHistorial ? citasPasadas : citasFuturas;
@@ -136,6 +177,17 @@ const Citas = () => {
                     <div className="botones-cita">
                       <button onClick={() => handleEditar(cita.id)} className="btn-editar">Editar</button>
                       <button onClick={() => handleEliminar(cita.id)} className="btn-eliminar">Eliminar</button>
+                      <button onClick={() => abrirGoogleCalendar(cita)} className="btn-calendar">
+                        <img
+                          src="https://www.gstatic.com/calendar/images/dynamiclogo_2020q4/calendar_16_2x.png"
+                          alt="Google Calendar"
+                          style={{ width: '16px', height: '16px', verticalAlign: 'middle' }}
+                        />
+                        <span>Añadir a Google Calendar</span>
+                      </button>
+
+
+                      <button onClick={() => descargarICS(cita)} className="btn-ics">Añadir a otros calendarios</button>
                     </div>
                   ) : (
                     <p className="texto-no-editable">No editable ni cancelable (menos de 24h)</p>
@@ -166,7 +218,6 @@ const Citas = () => {
                           <strong> Respuesta del centro:</strong> {valoraciones[cita.id].respuestaAdmin}
                         </p>
                       )}
-
                     </div>
                   ) : (
                     <div className="nueva-valoracion">
