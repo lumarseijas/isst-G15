@@ -1,10 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [usuario, setUsuario] = useState(null);
   const [mostrarPerfil, setMostrarPerfil] = useState(false);
+  const menuRef = useRef(); // 👈 referencia al menú
 
   // Cargar usuario desde localStorage cuando la página se renderiza
   useEffect(() => {
@@ -12,14 +13,27 @@ const Navbar = () => {
     if (usuarioGuardado) {
       setUsuario(usuarioGuardado);
     }
-  }, [setUsuario]);
+  }, []);
+
+  // Cerrar menú si se hace clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMostrarPerfil(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('usuario'); // Eliminar usuario del almacenamiento
+    localStorage.removeItem('usuario');
     setUsuario(null);
     setMostrarPerfil(false);
     alert("Sesión cerrada correctamente.");
-    window.location.reload(); // Refresca la página para actualizar el estado
+    window.location.reload();
   };
 
   return (
@@ -34,7 +48,7 @@ const Navbar = () => {
         <li><Link to="/servicios">Servicios</Link></li>
         <li><Link to="/reservas">Reservar</Link></li>
         {usuario?.tipo === "ADMINISTRADOR" && (
-        <li><Link to="/Admin">Panel Administrador</Link></li>
+          <li><Link to="/Admin">Panel Administrador</Link></li>
         )}
       </ul>
 
@@ -55,11 +69,11 @@ const Navbar = () => {
 
         {/* Menú desplegable si el usuario está logueado */}
         {usuario && mostrarPerfil && (
-          <div className="perfil-menu">
+          <div className="perfil-menu" ref={menuRef}>
             <p><strong>{usuario.nombre}</strong></p>
             <p>📧 {usuario.email}</p>
             {usuario?.tipo !== "ADMINISTRADOR" && (
-            <button className="btn-editar" onClick={() => navigate('/citas')}>Mis citas</button>
+              <button className="btn-editar" onClick={() => navigate('/citas')}>Mis citas</button>
             )}
             <button className="btn-editar" onClick={() => navigate('/perfil')}>Editar Perfil</button>
             <button className="btn-cerrar" onClick={handleLogout}>Cerrar Sesión</button>

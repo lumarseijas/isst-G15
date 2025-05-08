@@ -10,10 +10,11 @@ const OAuth2Redirect = ({ setUsuario }) => {
     const id = params.get('id');
     const nombre = params.get('nombre');
     const email = params.get('email');
+    const avatar = params.get('avatar');
     const token = params.get('token');
 
-    if (id && nombre && email && token) {
-      const usuario = { id, nombre, email };
+    if (id && nombre && email && avatar && token) {
+      const usuario = { id, nombre, email, avatar };
 
       localStorage.setItem('usuario', JSON.stringify(usuario));
       localStorage.setItem('token', token);

@@ -59,6 +59,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
                 "?id=" + usuario.getId() +
                 "&nombre=" + URLEncoder.encode(usuario.getNombre(), StandardCharsets.UTF_8) +
                 "&email=" + URLEncoder.encode(usuario.getEmail(), StandardCharsets.UTF_8) +
+                "&avatar=" + URLEncoder.encode(usuario.getAvatar(), StandardCharsets.UTF_8) +
                 "&token=" + URLEncoder.encode(token, StandardCharsets.UTF_8);
             System.out.println("➡️ Redirigiendo a: " + redirectUrl);
         response.sendRedirect(redirectUrl);

@@ -53,11 +53,32 @@ const Login = ({ setUsuario }) => {
 
       <hr style={{ margin: '20px 0' }} />
 
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <a href="http://localhost:5000/oauth2/authorization/google">
-          <button>Ingresar con Google</button>
-        </a>
-      </div>
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+  <a href="http://localhost:5000/oauth2/authorization/google" style={{ textDecoration: 'none' }}>
+    <button
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        backgroundColor: 'white',
+        color: '#555',
+        border: '1px solid #ddd',
+        padding: '10px 15px',
+        borderRadius: '5px',
+        fontWeight: '500',
+        boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
+        cursor: 'pointer'
+      }}
+    >
+      <img
+        src="/public/img/google.png"
+        alt="Google logo"
+        style={{ width: '20px', height: '20px', marginRight: '10px' }}
+      />
+      Iniciar sesión con Google
+    </button>
+  </a>
+</div>
+
     </div>
   );
 };
