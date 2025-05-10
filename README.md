@@ -78,7 +78,7 @@ mvn spring-boot:run
 ```
 Esto lanzará el backend en:
 ```bash
-http://localhost:5000
+http://localhost:5173
 ```
 ### 4. Ver la página web: 
 Desde la carpeta `reserva-belleza-web`, ejecuta:
